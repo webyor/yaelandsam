@@ -14,10 +14,11 @@
   <meta name="description" content="Wedding website for Yael Weber and Sam Matatov, June 20, 2027, The Stone House at Clove Lakes, Staten Island, NY.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Great+Vibes&family=Frank+Ruhl+Libre:wght@400;500&family=Marck+Script&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Great+Vibes&family=Frank+Ruhl+Libre:wght@400;500&family=Marck+Script&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
+<!-- "locked" hides the site until the passcode is entered (js/gate.js). -->
+<body class="locked">
   <header class="site-header">
     <div class="lang-switch" role="group" aria-label="Language">
       <button type="button" data-lang="en">English</button>
@@ -38,13 +39,25 @@
     </nav>
   </header>
 
+  <!-- Passcode screen, shown while the body has class "locked". -->
+  <section id="gate" class="gate">
+    <form id="gate-form" class="card form">
+      <h2 data-i18n="gate.title"></h2>
+      <p data-i18n="gate.intro"></p>
+      <label><span data-i18n="gate.label"></span>
+        <input name="code" type="password" required autocomplete="off"></label>
+      <button type="submit" class="btn" data-i18n="gate.button"></button>
+      <p class="form-status" role="status"></p>
+    </form>
+  </section>
+
   <main>
     <!-- HOME -->
     <section id="home" class="tab">
       <p class="eyebrow" data-i18n="home.eyebrow"></p>
       <p class="eyebrow eyebrow-sub" data-i18n="home.eyebrowSub"></p>
-      <!-- Watercolor leaf sprig cut from the Save the Date. -->
-      <img class="sprig" src="images/leaves.png" alt="" width="128" height="44">
+      <!-- White flower cluster cut from the Save the Date's top-left corner. -->
+      <img class="sprig" src="images/flower.png" alt="" width="378" height="348">
       <p class="date-line" data-i18n="home.date"></p>
       <p class="venue-line" data-i18n="home.venue"></p>
 
@@ -64,27 +77,34 @@
       <p class="rsvp-by" data-i18n="home.rsvpBy"></p>
       <button type="button" class="btn" id="open-rsvp" data-i18n="home.rsvpButton"></button>
 
-      <form id="rsvp-form" class="card form" hidden>
+      <!--
+        RSVP, step 1: the guest types their name; the Google Sheet's "Guests" tab
+        is searched (see apps-script/Code.gs) and their party comes back.
+      -->
+      <form id="find-form" class="card form" hidden>
         <h2 data-i18n="rsvp.title"></h2>
-        <label><span data-i18n="rsvp.name"></span>
+        <label><span data-i18n="rsvp.findLabel"></span>
           <input name="name" required maxlength="120" autocomplete="name"></label>
+        <input type="hidden" name="formType" value="lookup">
+        <button type="submit" class="btn" data-i18n="rsvp.findButton"></button>
+        <p class="form-status" role="status"></p>
+      </form>
+
+      <!-- RSVP, step 2: one yes/no per person in the party (filled in by js/rsvp.js). -->
+      <form id="rsvp-form" class="card form" hidden>
+        <h2 id="party-name"></h2>
+        <p id="party-size" class="muted"></p>
+        <div id="party-members"></div>
         <label><span data-i18n="rsvp.email"></span>
           <input name="email" type="email" maxlength="200" autocomplete="email"></label>
-        <fieldset>
-          <legend data-i18n="rsvp.attending"></legend>
-          <label class="inline"><input type="radio" name="attending" value="yes" required> <span data-i18n="rsvp.yes"></span></label>
-          <label class="inline"><input type="radio" name="attending" value="no"> <span data-i18n="rsvp.no"></span></label>
-        </fieldset>
-        <label><span data-i18n="rsvp.guests"></span>
-          <input name="guests" type="number" min="1" value="1" required></label>
-        <label><span data-i18n="rsvp.guestNames"></span>
-          <textarea name="guestNames" rows="2" maxlength="500"></textarea></label>
         <label><span data-i18n="rsvp.message"></span>
           <textarea name="message" rows="3" maxlength="1000"></textarea></label>
         <!-- Honeypot: hidden from people, bots tend to fill it; the server ignores such replies. -->
         <input name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
         <input type="hidden" name="formType" value="rsvp">
+        <input type="hidden" name="party">
         <button type="submit" class="btn" data-i18n="rsvp.submit"></button>
+        <button type="button" class="btn btn-light" id="not-me" data-i18n="rsvp.notMe"></button>
         <p class="form-status" role="status"></p>
       </form>
     </section>
@@ -180,5 +200,7 @@
   <script src="js/lang/he.js"></script>
   <script src="js/lang/ru.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/gate.js"></script>
+  <script src="js/rsvp.js"></script>
 </body>
 </html>

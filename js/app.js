@@ -4,7 +4,9 @@
  *  - language switch (en / he / ru) filled from window.LANG
  *  - countdown to the wedding
  *  - photo placeholders when an image file is not uploaded yet
- *  - RSVP and food-allergy forms posted to the Google Apps Script endpoint
+ *  - the food-allergy form posted to the Google Apps Script endpoint
+ * Shares t(), setStatus() and post() as window.SITE for js/gate.js and
+ * js/rsvp.js, and fires a "langchange" event on document when the language changes.
  */
 (function () {
   "use strict";
@@ -40,6 +42,7 @@
     document.querySelectorAll("[data-lang]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.lang === code)));
     renderFaq();
     renderTodo();
+    document.dispatchEvent(new Event("langchange"));
     try { localStorage.setItem(LANG_KEY, code); } catch (e) { /* storage blocked: language just won't be remembered */ }
   }
 
@@ -114,36 +117,48 @@
 
   function setStatus(form, key, kind) {
     const status = form.querySelector(".form-status");
-    status.textContent = t(key);
+    status.textContent = key ? t(key) : ""; // empty key clears the message
     status.className = "form-status " + kind;
   }
 
-  async function submitForm(event) {
-    event.preventDefault();
-    const form = event.currentTarget;
+  /**
+   * Sends a form's fields to the Apps Script endpoint and returns its JSON reply.
+   * form-urlencoded keeps this a "simple" request, so Apps Script needs no CORS preflight.
+   * Throws if the endpoint is not configured (err.notReady) or the request fails.
+   */
+  async function post(form) {
     if (!config.FORM_ENDPOINT) {
-      setStatus(form, "forms.notReady", "err");
-      return;
+      const err = new Error("FORM_ENDPOINT is not set in js/config.js");
+      err.notReady = true;
+      throw err;
     }
-    const button = form.querySelector("button[type=submit]");
     const data = new URLSearchParams(new FormData(form));
     data.append("lang", document.documentElement.lang);
+    const res = await fetch(config.FORM_ENDPOINT, { method: "POST", body: data });
+    return res.json();
+  }
+
+  /** Food-allergy form: send, then thank the guest or show an error. */
+  async function submitDiet(event) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const button = form.querySelector("button[type=submit]");
     button.disabled = true;
     setStatus(form, "forms.sending", "");
     try {
-      // form-urlencoded body keeps this a "simple" request, so Apps Script needs no CORS preflight.
-      const res = await fetch(config.FORM_ENDPOINT, { method: "POST", body: data });
-      const body = await res.json();
+      const body = await post(form);
       if (!body.ok) throw new Error(body.error || "Server rejected the reply");
       form.reset();
       setStatus(form, "forms.thanks", "ok");
     } catch (err) {
       console.error("Form submit failed:", err);
-      setStatus(form, "forms.error", "err");
+      setStatus(form, err.notReady ? "forms.notReady" : "forms.error", "err");
     } finally {
       button.disabled = false;
     }
   }
+
+  window.SITE = Object.freeze({ t, setStatus, post });
 
   // ---------- Start ----------
 
@@ -161,13 +176,7 @@
     e.currentTarget.setAttribute("aria-expanded", String(open));
   });
 
-  document.getElementById("open-rsvp").addEventListener("click", () => {
-    const form = document.getElementById("rsvp-form");
-    form.hidden = false;
-    form.scrollIntoView({ behavior: "smooth" });
-  });
-
-  document.querySelectorAll("form").forEach((f) => f.addEventListener("submit", submitForm));
+  document.getElementById("diet-form").addEventListener("submit", submitDiet);
   window.addEventListener("hashchange", showTab);
 
   setLang(savedLang() || config.DEFAULT_LANG);

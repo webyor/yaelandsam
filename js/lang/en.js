@@ -37,14 +37,26 @@ window.LANG.en = {
   rsvp: {
     title: "RSVP",
     name: "Full name",
+    findLabel: "Please enter your first and last name as they appear on your invitation",
+    findButton: "Find my invitation",
+    searching: "Looking you up…",
+    notFound: "We couldn't find that name. Please check the spelling, or contact Yael or Sam.",
+    multiple: "More than one guest has that name. Please contact Yael or Sam to RSVP.",
+    partyOf: "Your party: {n} guest(s). Please reply for each person.",
+    notMe: "Not you? Search again",
     email: "Email (optional)",
-    attending: "Will you be joining us?",
     yes: "Joyfully accepts",
     no: "Regretfully declines",
-    guests: "Number of guests, including you",
-    guestNames: "Names of your guests",
     message: "A note for the couple (optional)",
     submit: "Send RSVP",
+  },
+
+  gate: {
+    title: "Welcome",
+    intro: "Please enter the passcode from your invitation to view our website.",
+    label: "Passcode",
+    button: "Enter",
+    wrong: "That passcode isn't right. Please try again.",
   },
 
   forms: {
