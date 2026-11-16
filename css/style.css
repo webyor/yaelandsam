@@ -16,6 +16,7 @@
   --text: #3a2f26;
   --muted: #6f6458;
   --border: #d9e3c9;
+  --frame: #5d7f1a; /* sampled from the invite's frame line */
   --radius: 10px;
   --font-serif: "Cormorant Garamond", Georgia, serif;
   --font-script: "Great Vibes", "Cormorant Garamond", cursive;
@@ -31,7 +32,11 @@ html[lang="ru"] { --font-script: "Marck Script", "Cormorant Garamond", cursive; 
 
 body {
   margin: 0;
-  background: var(--cream);
+  /* Faint watercolor sprigs drifting down both sides, like the invite's greenery. */
+  background:
+    url("../images/leaves-left.png") left 20px top 170px / 170px auto repeat-y,
+    url("../images/leaves-right.png") right 20px top 520px / 170px auto repeat-y,
+    var(--cream);
   color: var(--text);
   font-family: var(--font-serif);
   font-size: 1.2rem;
@@ -97,7 +102,8 @@ html[dir="rtl"] .site-header::before { transform: scaleX(-1); }
 main { max-width: 760px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
 .tab { text-align: center; }
 .eyebrow { letter-spacing: 0.35em; text-transform: uppercase; color: var(--wood-dark); margin: 1rem 0 0; }
-.eyebrow-sub { font-style: italic; font-size: 1.35rem; color: var(--wood-dark); margin: 0.2rem 0 0; }
+/* Second line under "We're getting married": same lettering, a touch smaller. */
+.eyebrow-sub { font-size: 0.95rem; margin-top: 0.3rem; }
 .date-line { font-size: 1.6rem; letter-spacing: 0.2em; color: var(--green); margin: 0.3rem 0; }
 .venue-line { font-style: italic; margin: 0; }
 
@@ -125,25 +131,12 @@ html[dir="rtl"] .sprig { transform: scaleX(-1); }
 /* app.js adds .missing when the photo file is not there yet. */
 .photo.missing img { display: none; }
 .photo.missing .photo-placeholder { display: flex; }
-/* Venue: show the painted stone house from the bottom of the invite. */
-.venue-photo img { aspect-ratio: 2 / 1; object-fit: cover; object-position: 50% 100%; }
 /*
-  The crop cuts off the invite's green frame at the top. Redraw that line.
-  In the invite the frame sits 22px in from the edge of a 1087px-wide image
-  (2.02% of its width), so the line is placed at the same inset here.
-  100cqw = figure width; minus 16px for the img's 8px white border on each side.
+  Venue: images/venue.jpg is the invite's painting cropped just inside its
+  frame. One green line drawn inside the white mat outlines all four sides
+  evenly, like the invite's frame.
 */
-.venue-photo { position: relative; container-type: inline-size; }
-.venue-photo::after {
-  content: "";
-  position: absolute;
-  top: calc(8px + (100cqw - 16px) * 0.0202);
-  left: calc(8px + (100cqw - 16px) * 0.0202);
-  right: calc(8px + (100cqw - 16px) * 0.0202);
-  height: 2px;
-  background: #5d7f1a; /* sampled from the invite's frame line */
-  pointer-events: none;
-}
+.venue-photo img { height: auto; outline: 2px solid var(--frame); outline-offset: -6px; }
 
 /* ---------- Cards, buttons, forms ---------- */
 .card {
@@ -198,7 +191,23 @@ html[dir="rtl"] .sprig { transform: scaleX(-1); }
 .grid ul { padding-inline-start: 1.2rem; margin: 0; }
 
 /* ---------- Footer ---------- */
-.site-footer { text-align: center; padding: 2rem 1rem 3rem; border-top: 1px solid var(--border); }
+.site-footer { text-align: center; padding: 2rem 1rem 3rem; border-top: 1px solid var(--border); position: relative; }
+/* Same flower corner as the header, turned around for the bottom-right corner. */
+.site-footer::after {
+  content: "";
+  position: absolute;
+  inset-block-end: 0;
+  inset-inline-end: 0;
+  width: 230px;
+  height: 125px;
+  background: url("../images/save-the-date.jpg") left top / 560px auto no-repeat;
+  -webkit-mask-image: radial-gradient(ellipse at top left, #000 55%, transparent 75%);
+  mask-image: radial-gradient(ellipse at top left, #000 55%, transparent 75%);
+  transform: rotate(180deg);
+  pointer-events: none;
+}
+/* Hebrew: corner sits bottom-left; mirror so the flowers still point inward. */
+html[dir="rtl"] .site-footer::after { transform: rotate(180deg) scaleX(-1); }
 .site-footer .script { font-size: 2.2rem; margin: 0; }
 .site-footer p:last-child { letter-spacing: 0.3em; color: var(--wood-dark); margin: 0; }
 
@@ -206,7 +215,10 @@ html[dir="rtl"] .sprig { transform: scaleX(-1); }
 @media (max-width: 640px) {
   body { font-size: 1.1rem; outline-offset: -8px; border-width: 3px; }
   .site-header { padding-top: 1.2rem; }
-  .site-header::before { width: 130px; height: 72px; background-size: 320px auto; }
+  .site-header::before, .site-footer::after { width: 130px; height: 72px; background-size: 320px auto; }
+  /* Room under the names so the corner flowers don't cover them. */
+  .site-footer { padding-bottom: 5rem; }
+  body { background-size: 80px auto, 80px auto, auto; background-position: left 10px top 170px, right 10px top 520px, 0 0; }
   .header-names { font-size: 2.4rem; }
   .menu-toggle {
     display: inline-block; margin-top: 0.8rem; background: none; border: 1px solid var(--green);

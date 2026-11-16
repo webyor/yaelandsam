@@ -6,6 +6,7 @@ window.LANG = window.LANG || {};
 window.LANG.he = {
   pageTitle: "יעל וסאם · 20 ביוני 2027",
   namesShort: "יעל וסאם",
+  namesFull: "יעל ובר וסאם מטטוב",
   headerMeta: "יום ראשון, 20 ביוני 2027",
   menu: "תפריט",
   photoComing: "התמונה תעלה בקרוב",

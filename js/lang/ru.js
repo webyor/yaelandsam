@@ -6,6 +6,7 @@ window.LANG = window.LANG || {};
 window.LANG.ru = {
   pageTitle: "Яэль и Сэм · 20 июня 2027",
   namesShort: "Яэль и Сэм",
+  namesFull: "Яэль Вебер и Сэм Мататов",
   headerMeta: "Воскресенье, 20 июня 2027",
   menu: "Меню",
   photoComing: "Фото скоро появится",

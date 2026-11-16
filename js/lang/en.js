@@ -7,6 +7,7 @@ window.LANG = window.LANG || {};
 window.LANG.en = {
   pageTitle: "Yael & Sam · June 20, 2027",
   namesShort: "Yael & Sam",
+  namesFull: "Yael Weber & Sam Matatov",
   headerMeta: "Sunday, June 20, 2027",
   menu: "Menu",
   photoComing: "Photo coming soon",
