@@ -116,8 +116,8 @@ main { max-width: 760px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
 .date-line { font-size: 1.6rem; letter-spacing: 0.2em; color: var(--green); margin: 0.3rem 0; }
 .venue-line { font-style: italic; margin: 0; }
 
-/* Flower divider (images/flower.png, the invite's corner flowers with faded edges). */
-.sprig { display: block; width: 140px; height: auto; margin: 0.6rem auto; }
+/* Flower corner art (images/flower.png), centred under the heading. */
+.sprig { display: block; width: 300px; max-width: 80%; height: auto; margin: 0.8rem auto; }
 
 .countdown { display: flex; justify-content: center; gap: 0.8rem; margin: 2rem 0; flex-wrap: wrap; }
 .countdown div {
@@ -228,7 +228,12 @@ html[dir="rtl"] .site-footer::after { transform: rotate(180deg) scaleX(-1); }
   .site-header::before, .site-footer::after { width: 130px; height: 72px; background-size: 320px auto; }
   /* Room under the names so the corner flowers don't cover them. */
   .site-footer { padding-bottom: 5rem; }
-  body { background-size: 80px auto, 80px auto, auto; background-position: left 10px top 170px, right 10px top 520px, 0 0; }
+  /* Phones: small side leaves that don't repeat, so only a few appear near the top. */
+  body {
+    background-size: 70px auto, 70px auto, auto;
+    background-position: left 6px top 170px, right 6px top 420px, 0 0;
+    background-repeat: no-repeat, no-repeat, repeat;
+  }
   .header-names { font-size: 2.4rem; }
   .menu-toggle {
     display: inline-block; margin-top: 0.8rem; background: none; border: 1px solid var(--green);
