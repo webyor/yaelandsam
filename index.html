@@ -1,0 +1,179 @@
+<!doctype html>
+<!--
+  Yael & Sam wedding website.
+  Single page with tab sections (Home, Travel, Schedule, Entertainment & Food,
+  Registry, Q&A, Things to Do). All visible text comes from js/lang/*.js so the
+  page can switch between English, Hebrew (right-to-left) and Russian.
+  Elements with data-i18n="key" get their text from the active language file.
+-->
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Yael &amp; Sam · June 20, 2027</title>
+  <meta name="description" content="Wedding website for Yael Weber and Sam Matatov, June 20, 2027, The Stone House at Clove Lakes, Staten Island, NY.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Great+Vibes&family=Frank+Ruhl+Libre:wght@400;500&family=Marck+Script&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="lang-switch" role="group" aria-label="Language">
+      <button type="button" data-lang="en">English</button>
+      <button type="button" data-lang="he">עברית</button>
+      <button type="button" data-lang="ru">Русский</button>
+    </div>
+    <p class="header-names script" data-i18n="namesShort"></p>
+    <p class="header-meta" data-i18n="headerMeta"></p>
+    <button type="button" class="menu-toggle" aria-expanded="false" aria-controls="site-nav" data-i18n="menu"></button>
+    <nav id="site-nav" class="site-nav">
+      <a href="#home" data-i18n="nav.home"></a>
+      <a href="#travel" data-i18n="nav.travel"></a>
+      <a href="#schedule" data-i18n="nav.schedule"></a>
+      <a href="#food" data-i18n="nav.food"></a>
+      <a href="#registry" data-i18n="nav.registry"></a>
+      <a href="#faq" data-i18n="nav.faq"></a>
+      <a href="#todo" data-i18n="nav.todo"></a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- HOME -->
+    <section id="home" class="tab">
+      <p class="eyebrow" data-i18n="home.eyebrow"></p>
+      <h1 class="names script" data-i18n="namesFull"></h1>
+      <p class="sprig" aria-hidden="true"></p>
+      <p class="date-line" data-i18n="home.date"></p>
+      <p class="venue-line" data-i18n="home.venue"></p>
+
+      <div class="countdown" aria-live="off">
+        <div><span id="cd-days">0</span><small data-i18n="countdown.days"></small></div>
+        <div><span id="cd-hours">0</span><small data-i18n="countdown.hours"></small></div>
+        <div><span id="cd-mins">0</span><small data-i18n="countdown.minutes"></small></div>
+        <div><span id="cd-secs">0</span><small data-i18n="countdown.seconds"></small></div>
+      </div>
+
+      <!-- Couple photo: save it as images/couple.jpg and it appears here. -->
+      <figure class="photo">
+        <img src="images/couple.jpg" alt="" data-i18n-alt="home.photoAlt" data-fallback>
+        <div class="photo-placeholder" data-i18n="photoComing"></div>
+      </figure>
+
+      <p class="rsvp-by" data-i18n="home.rsvpBy"></p>
+      <button type="button" class="btn" id="open-rsvp" data-i18n="home.rsvpButton"></button>
+
+      <form id="rsvp-form" class="card form" hidden>
+        <h2 data-i18n="rsvp.title"></h2>
+        <label><span data-i18n="rsvp.name"></span>
+          <input name="name" required maxlength="120" autocomplete="name"></label>
+        <label><span data-i18n="rsvp.email"></span>
+          <input name="email" type="email" maxlength="200" autocomplete="email"></label>
+        <fieldset>
+          <legend data-i18n="rsvp.attending"></legend>
+          <label class="inline"><input type="radio" name="attending" value="yes" required> <span data-i18n="rsvp.yes"></span></label>
+          <label class="inline"><input type="radio" name="attending" value="no"> <span data-i18n="rsvp.no"></span></label>
+        </fieldset>
+        <label><span data-i18n="rsvp.guests"></span>
+          <input name="guests" type="number" min="1" value="1" required></label>
+        <label><span data-i18n="rsvp.guestNames"></span>
+          <textarea name="guestNames" rows="2" maxlength="500"></textarea></label>
+        <label><span data-i18n="rsvp.message"></span>
+          <textarea name="message" rows="3" maxlength="1000"></textarea></label>
+        <!-- Honeypot: hidden from people, bots tend to fill it; the server ignores such replies. -->
+        <input name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <input type="hidden" name="formType" value="rsvp">
+        <button type="submit" class="btn" data-i18n="rsvp.submit"></button>
+        <p class="form-status" role="status"></p>
+      </form>
+    </section>
+
+    <!-- TRAVEL -->
+    <section id="travel" class="tab" hidden>
+      <h2 data-i18n="travel.title"></h2>
+      <div class="card">
+        <h3><a href="https://www.thestonehousesi.com/" target="_blank" rel="noopener" data-i18n="travel.venueName"></a></h3>
+        <p class="address" data-i18n="travel.address"></p>
+        <p><a class="btn btn-light" target="_blank" rel="noopener"
+              href="https://www.google.com/maps/search/?api=1&query=1150+Clove+Road+Staten+Island+NY+10301"
+              data-i18n="travel.mapLink"></a></p>
+        <p data-i18n="travel.rideNote"></p>
+        <p class="muted" data-i18n="travel.more"></p>
+      </div>
+      <figure class="photo venue-photo">
+        <img src="images/save-the-date.jpg" alt="" data-i18n-alt="travel.photoAlt">
+      </figure>
+    </section>
+
+    <!-- SCHEDULE -->
+    <section id="schedule" class="tab" hidden>
+      <h2 data-i18n="schedule.title"></h2>
+      <ol class="timeline">
+        <li><time data-i18n="schedule.cocktailTime"></time><span data-i18n="schedule.cocktail"></span></li>
+        <li><time data-i18n="schedule.ceremonyTime"></time><span data-i18n="schedule.ceremony"></span></li>
+        <li><time data-i18n="schedule.receptionTime"></time><span data-i18n="schedule.reception"></span></li>
+      </ol>
+      <p class="muted" data-i18n="schedule.note"></p>
+    </section>
+
+    <!-- ENTERTAINMENT & FOOD -->
+    <section id="food" class="tab" hidden>
+      <h2 data-i18n="food.title"></h2>
+      <div class="card">
+        <h3 data-i18n="food.kosherTitle"></h3>
+        <p data-i18n="food.kosher"></p>
+      </div>
+      <form id="diet-form" class="card form">
+        <h3 data-i18n="food.dietTitle"></h3>
+        <label><span data-i18n="rsvp.name"></span>
+          <input name="name" required maxlength="120" autocomplete="name"></label>
+        <label><span data-i18n="food.dietLabel"></span>
+          <textarea name="dietary" rows="3" required maxlength="1000"></textarea></label>
+        <input name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <input type="hidden" name="formType" value="dietary">
+        <button type="submit" class="btn" data-i18n="food.dietSubmit"></button>
+        <p class="form-status" role="status"></p>
+      </form>
+      <div class="card">
+        <h3 data-i18n="food.danceTitle"></h3>
+        <p data-i18n="food.dance"></p>
+      </div>
+      <!-- Party photo: save it as images/party.jpg and it appears here. -->
+      <figure class="photo">
+        <img src="images/party.jpg" alt="" data-fallback>
+        <div class="photo-placeholder" data-i18n="photoComing"></div>
+      </figure>
+    </section>
+
+    <!-- REGISTRY -->
+    <section id="registry" class="tab" hidden>
+      <h2 data-i18n="registry.title"></h2>
+      <div class="card"><p data-i18n="registry.body"></p></div>
+    </section>
+
+    <!-- Q&A: questions live in js/lang/*.js under "faq.items". -->
+    <section id="faq" class="tab" hidden>
+      <h2 data-i18n="faq.title"></h2>
+      <div id="faq-list"></div>
+      <p class="muted" data-i18n="faq.more"></p>
+    </section>
+
+    <!-- THINGS TO DO: the five spots live in js/lang/*.js under "todo.items". -->
+    <section id="todo" class="tab" hidden>
+      <h2 data-i18n="todo.title"></h2>
+      <div id="todo-list" class="grid"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p class="script" data-i18n="namesShort"></p>
+    <p>06.20.27</p>
+  </footer>
+
+  <script src="js/config.js"></script>
+  <script src="js/lang/en.js"></script>
+  <script src="js/lang/he.js"></script>
+  <script src="js/lang/ru.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

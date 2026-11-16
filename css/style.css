@@ -1,0 +1,204 @@
+/*
+  Yael & Sam wedding site styles.
+  Palette follows the Save the Date: leafy green, warm white, wood brown.
+  Hebrew switches the page to dir="rtl"; layout uses logical properties
+  (margin-inline, text-align: start) so it mirrors automatically.
+*/
+
+:root {
+  --green: #4f7a28;
+  --green-dark: #3b5d1c;
+  --green-soft: #e8f0dc;
+  --wood: #8a6a4a;
+  --wood-dark: #5b4330;
+  --cream: #fbfaf5;
+  --white: #ffffff;
+  --text: #3a2f26;
+  --muted: #6f6458;
+  --border: #d9e3c9;
+  --radius: 10px;
+  --font-serif: "Cormorant Garamond", Georgia, serif;
+  --font-script: "Great Vibes", "Cormorant Garamond", cursive;
+}
+
+/* Hebrew and Russian get fonts that contain their alphabets. */
+html[lang="he"] { --font-serif: "Frank Ruhl Libre", "Cormorant Garamond", serif; --font-script: "Frank Ruhl Libre", serif; }
+/* Hebrew letters must not be spaced apart; drop the decorative letter-spacing. */
+html[lang="he"] * { letter-spacing: normal !important; }
+html[lang="ru"] { --font-script: "Marck Script", "Cormorant Garamond", cursive; }
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--cream);
+  color: var(--text);
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
+  line-height: 1.6;
+  /* Thin green frame like the invite's border. */
+  border: 6px solid var(--white);
+  outline: 1px solid var(--green);
+  outline-offset: -12px;
+  min-height: 100vh;
+}
+
+a { color: var(--green-dark); }
+h2, h3 { font-weight: 500; letter-spacing: 0.04em; color: var(--wood-dark); }
+h2 { font-size: 2rem; text-align: center; text-transform: uppercase; letter-spacing: 0.18em; }
+h3 { font-size: 1.4rem; margin-top: 0; }
+.script { font-family: var(--font-script); color: var(--green); }
+.muted { color: var(--muted); font-style: italic; }
+
+/* ---------- Header & navigation ---------- */
+.site-header {
+  text-align: center;
+  padding: 2.5rem 1rem 0.5rem;
+  position: relative;
+}
+/* Flower corner: a small box that shows only the top-left florals of the invite. */
+.site-header::before {
+  content: "";
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  width: 230px;
+  height: 125px; /* stops above the invite's "SAVE THE DATE" line */
+  background: url("../images/save-the-date.jpg") left top / 560px auto no-repeat;
+  -webkit-mask-image: radial-gradient(ellipse at top left, #000 55%, transparent 75%);
+  mask-image: radial-gradient(ellipse at top left, #000 55%, transparent 75%);
+  pointer-events: none;
+}
+/* In Hebrew the corner moves to the right; mirror the art so it still points inward. */
+html[dir="rtl"] .site-header::before { transform: scaleX(-1); }
+.site-header > * { position: relative; }
+.header-names { font-size: 3rem; margin: 0.5rem 0 0; line-height: 1.1; }
+.header-meta { margin: 0; letter-spacing: 0.15em; text-transform: uppercase; font-size: 0.85rem; color: var(--wood-dark); }
+
+.lang-switch { display: flex; justify-content: flex-end; gap: 0.4rem; }
+.lang-switch button {
+  background: none; border: 1px solid var(--border); border-radius: 999px;
+  padding: 0.2rem 0.8rem; font: inherit; font-size: 0.9rem; color: var(--wood-dark); cursor: pointer;
+}
+.lang-switch button[aria-pressed="true"] { background: var(--green); border-color: var(--green); color: var(--white); }
+
+.site-nav {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 0.3rem 1.4rem;
+  margin: 1.2rem auto 0; padding: 0.7rem 0; border-block: 1px solid var(--border); max-width: 900px;
+}
+.site-nav a {
+  text-decoration: none; color: var(--wood-dark); letter-spacing: 0.08em; font-size: 1rem;
+  padding-bottom: 2px; border-bottom: 2px solid transparent;
+}
+.site-nav a[aria-current="page"], .site-nav a:hover { color: var(--green); border-bottom-color: var(--green); }
+.menu-toggle { display: none; }
+
+/* ---------- Sections ---------- */
+main { max-width: 760px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+.tab { text-align: center; }
+.eyebrow { letter-spacing: 0.35em; text-transform: uppercase; color: var(--wood-dark); margin: 1rem 0 0; }
+.names { font-size: clamp(2.6rem, 9vw, 4.4rem); font-weight: 400; margin: 0.2rem 0 0; line-height: 1.15; }
+.date-line { font-size: 1.6rem; letter-spacing: 0.2em; color: var(--green); margin: 0.3rem 0; }
+.venue-line { font-style: italic; margin: 0; }
+
+/* Small leaf divider, drawn inline so it needs no extra image file. */
+.sprig {
+  height: 22px; margin: 0.6rem auto;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 22'%3E%3Cpath d='M5 11 H155' stroke='%234f7a28' stroke-width='1.2'/%3E%3Cg fill='%237fa04a'%3E%3Cellipse cx='60' cy='6' rx='7' ry='3' transform='rotate(-25 60 6)'/%3E%3Cellipse cx='80' cy='5' rx='7' ry='3' transform='rotate(-25 80 5)'/%3E%3Cellipse cx='100' cy='6' rx='7' ry='3' transform='rotate(-25 100 6)'/%3E%3Cellipse cx='70' cy='16' rx='7' ry='3' transform='rotate(25 70 16)'/%3E%3Cellipse cx='90' cy='17' rx='7' ry='3' transform='rotate(25 90 17)'/%3E%3C/g%3E%3C/svg%3E") center / 160px 22px no-repeat;
+}
+
+.countdown { display: flex; justify-content: center; gap: 0.8rem; margin: 2rem 0; flex-wrap: wrap; }
+.countdown div {
+  background: var(--white); border: 1px solid var(--border); border-radius: var(--radius);
+  width: 6rem; padding: 0.7rem 0.3rem; box-shadow: 0 2px 8px rgba(79,122,40,0.07);
+}
+.countdown span { display: block; font-size: 2.2rem; color: var(--green); line-height: 1.1; }
+.countdown small { text-transform: uppercase; letter-spacing: 0.12em; font-size: 0.75rem; color: var(--wood-dark); }
+
+/* ---------- Photos ---------- */
+.photo { margin: 2rem auto; max-width: 560px; }
+.photo img { width: 100%; display: block; border-radius: var(--radius); border: 8px solid var(--white); box-shadow: 0 4px 18px rgba(58,47,38,0.12); }
+.photo-placeholder {
+  display: none; aspect-ratio: 4 / 3; border: 2px dashed var(--border); border-radius: var(--radius);
+  background: var(--green-soft); color: var(--green-dark); font-style: italic;
+  align-items: center; justify-content: center;
+}
+/* app.js adds .missing when the photo file is not there yet. */
+.photo.missing img { display: none; }
+.photo.missing .photo-placeholder { display: flex; }
+/* Venue: show the painted stone house from the bottom of the invite. */
+.venue-photo img { aspect-ratio: 2 / 1; object-fit: cover; object-position: 50% 100%; }
+
+/* ---------- Cards, buttons, forms ---------- */
+.card {
+  background: var(--white); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 1.4rem 1.6rem; margin: 1.5rem 0; text-align: start;
+  border-top: 4px solid var(--wood);
+}
+/* The address is always English; keep its words in order on the Hebrew page too. */
+.address { font-size: 1.3rem; unicode-bidi: plaintext; }
+.btn {
+  display: inline-block; background: var(--green); color: var(--white); border: none; border-radius: 999px;
+  padding: 0.7rem 2.4rem; font: inherit; letter-spacing: 0.15em; text-transform: uppercase; text-decoration: none; cursor: pointer;
+}
+.btn:hover { background: var(--green-dark); }
+.btn:disabled { opacity: 0.6; cursor: wait; }
+.btn-light { background: var(--green-soft); color: var(--green-dark); font-size: 0.95rem; padding: 0.5rem 1.4rem; }
+.btn-light:hover { background: var(--border); }
+.rsvp-by { font-style: italic; color: var(--wood-dark); }
+
+.form label { display: block; margin: 0.9rem 0; }
+.form label > span, .form legend { display: block; font-size: 1rem; color: var(--wood-dark); margin-bottom: 0.25rem; }
+.form label.inline { display: inline-flex; gap: 0.4rem; margin-inline-end: 1.5rem; align-items: center; }
+.form fieldset { border: none; padding: 0; margin: 0.9rem 0; }
+.form input:not([type="radio"]), .form textarea {
+  width: 100%; font: inherit; font-size: 1.05rem; padding: 0.5rem 0.7rem;
+  border: 1px solid var(--border); border-radius: 6px; background: var(--cream); color: var(--text);
+}
+.form input:focus, .form textarea:focus { outline: 2px solid var(--green); outline-offset: 1px; }
+.form .btn { margin-top: 0.5rem; }
+.form-status { min-height: 1.5em; font-style: italic; }
+.form-status.ok { color: var(--green-dark); }
+.form-status.err { color: #a03a2a; }
+/* Honeypot: invisible and takes no space in either text direction. */
+.hp { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); opacity: 0; }
+
+/* ---------- Schedule ---------- */
+.timeline { list-style: none; padding: 0; margin: 2rem auto; max-width: 480px; }
+.timeline li {
+  display: grid; gap: 0.2rem; padding: 1rem 0; border-bottom: 1px solid var(--border);
+}
+/* Times always read left-to-right, even on the Hebrew page. */
+.timeline time { direction: ltr; unicode-bidi: isolate; color: var(--green); letter-spacing: 0.1em; font-size: 1.1rem; }
+.timeline span { font-size: 1.4rem; color: var(--wood-dark); }
+
+/* ---------- FAQ & Things to do ---------- */
+#faq-list { text-align: start; }
+#faq-list details { border-bottom: 1px solid var(--border); padding: 0.9rem 0; }
+#faq-list summary { cursor: pointer; font-weight: 500; color: var(--wood-dark); letter-spacing: 0.04em; }
+#faq-list p { margin: 0.6rem 0 0; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
+.grid .card { margin: 0; }
+.grid ul { padding-inline-start: 1.2rem; margin: 0; }
+
+/* ---------- Footer ---------- */
+.site-footer { text-align: center; padding: 2rem 1rem 3rem; border-top: 1px solid var(--border); }
+.site-footer .script { font-size: 2.2rem; margin: 0; }
+.site-footer p:last-child { letter-spacing: 0.3em; color: var(--wood-dark); margin: 0; }
+
+/* ---------- Phones ---------- */
+@media (max-width: 640px) {
+  body { font-size: 1.1rem; outline-offset: -8px; border-width: 3px; }
+  .site-header { padding-top: 1.2rem; }
+  .site-header::before { width: 130px; height: 72px; background-size: 320px auto; }
+  .header-names { font-size: 2.4rem; }
+  .menu-toggle {
+    display: inline-block; margin-top: 0.8rem; background: none; border: 1px solid var(--green);
+    color: var(--green); border-radius: 999px; padding: 0.3rem 1.2rem; font: inherit; cursor: pointer;
+  }
+  .site-nav { display: none; flex-direction: column; gap: 0.6rem; }
+  .site-nav.open { display: flex; }
+  .countdown div { width: 4.6rem; }
+  .countdown span { font-size: 1.7rem; }
+  .card { padding: 1.1rem 1.1rem; }
+}
