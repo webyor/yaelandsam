@@ -72,7 +72,7 @@ h3 { font-size: 1.4rem; margin-top: 0; }
 /* In Hebrew the corner moves to the right; mirror the art so it still points inward. */
 html[dir="rtl"] .site-header::before { transform: scaleX(-1); }
 .site-header > * { position: relative; }
-.header-names { font-size: 3rem; margin: 0.5rem 0 0; line-height: 1.1; }
+.header-names { font-size: 3rem; font-weight: 400; margin: 0.5rem 0 0; line-height: 1.1; }
 .header-meta { margin: 0; letter-spacing: 0.15em; text-transform: uppercase; font-size: 0.85rem; color: var(--wood-dark); }
 
 .lang-switch { display: flex; justify-content: flex-end; gap: 0.4rem; }
@@ -97,15 +97,14 @@ html[dir="rtl"] .site-header::before { transform: scaleX(-1); }
 main { max-width: 760px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
 .tab { text-align: center; }
 .eyebrow { letter-spacing: 0.35em; text-transform: uppercase; color: var(--wood-dark); margin: 1rem 0 0; }
-.names { font-size: clamp(2.6rem, 9vw, 4.4rem); font-weight: 400; margin: 0.2rem 0 0; line-height: 1.15; }
+.eyebrow-sub { font-style: italic; font-size: 1.35rem; color: var(--wood-dark); margin: 0.2rem 0 0; }
 .date-line { font-size: 1.6rem; letter-spacing: 0.2em; color: var(--green); margin: 0.3rem 0; }
 .venue-line { font-style: italic; margin: 0; }
 
-/* Small leaf divider, drawn inline so it needs no extra image file. */
-.sprig {
-  height: 22px; margin: 0.6rem auto;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 22'%3E%3Cpath d='M5 11 H155' stroke='%234f7a28' stroke-width='1.2'/%3E%3Cg fill='%237fa04a'%3E%3Cellipse cx='60' cy='6' rx='7' ry='3' transform='rotate(-25 60 6)'/%3E%3Cellipse cx='80' cy='5' rx='7' ry='3' transform='rotate(-25 80 5)'/%3E%3Cellipse cx='100' cy='6' rx='7' ry='3' transform='rotate(-25 100 6)'/%3E%3Cellipse cx='70' cy='16' rx='7' ry='3' transform='rotate(25 70 16)'/%3E%3Cellipse cx='90' cy='17' rx='7' ry='3' transform='rotate(25 90 17)'/%3E%3C/g%3E%3C/svg%3E") center / 160px 22px no-repeat;
-}
+/* Watercolor leaf divider (images/leaves.png, cut from the Save the Date). */
+.sprig { display: block; width: 150px; height: auto; margin: 0.8rem auto; }
+/* Leaves point right; mirror them on the right-to-left Hebrew page. */
+html[dir="rtl"] .sprig { transform: scaleX(-1); }
 
 .countdown { display: flex; justify-content: center; gap: 0.8rem; margin: 2rem 0; flex-wrap: wrap; }
 .countdown div {
@@ -128,6 +127,23 @@ main { max-width: 760px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
 .photo.missing .photo-placeholder { display: flex; }
 /* Venue: show the painted stone house from the bottom of the invite. */
 .venue-photo img { aspect-ratio: 2 / 1; object-fit: cover; object-position: 50% 100%; }
+/*
+  The crop cuts off the invite's green frame at the top. Redraw that line.
+  In the invite the frame sits 22px in from the edge of a 1087px-wide image
+  (2.02% of its width), so the line is placed at the same inset here.
+  100cqw = figure width; minus 16px for the img's 8px white border on each side.
+*/
+.venue-photo { position: relative; container-type: inline-size; }
+.venue-photo::after {
+  content: "";
+  position: absolute;
+  top: calc(8px + (100cqw - 16px) * 0.0202);
+  left: calc(8px + (100cqw - 16px) * 0.0202);
+  right: calc(8px + (100cqw - 16px) * 0.0202);
+  height: 2px;
+  background: #5d7f1a; /* sampled from the invite's frame line */
+  pointer-events: none;
+}
 
 /* ---------- Cards, buttons, forms ---------- */
 .card {

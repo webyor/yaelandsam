@@ -24,7 +24,7 @@
       <button type="button" data-lang="he">עברית</button>
       <button type="button" data-lang="ru">Русский</button>
     </div>
-    <p class="header-names script" data-i18n="namesShort"></p>
+    <h1 class="header-names script" data-i18n="namesShort"></h1>
     <p class="header-meta" data-i18n="headerMeta"></p>
     <button type="button" class="menu-toggle" aria-expanded="false" aria-controls="site-nav" data-i18n="menu"></button>
     <nav id="site-nav" class="site-nav">
@@ -42,8 +42,9 @@
     <!-- HOME -->
     <section id="home" class="tab">
       <p class="eyebrow" data-i18n="home.eyebrow"></p>
-      <h1 class="names script" data-i18n="namesFull"></h1>
-      <p class="sprig" aria-hidden="true"></p>
+      <p class="eyebrow-sub" data-i18n="home.eyebrowSub"></p>
+      <!-- Watercolor leaf sprig cut from the Save the Date. -->
+      <img class="sprig" src="images/leaves.png" alt="" width="128" height="44">
       <p class="date-line" data-i18n="home.date"></p>
       <p class="venue-line" data-i18n="home.venue"></p>
 
@@ -143,6 +144,10 @@
         <img src="images/party.jpg" alt="" data-fallback>
         <div class="photo-placeholder" data-i18n="photoComing"></div>
       </figure>
+      <div class="card">
+        <h3 data-i18n="food.photosTitle"></h3>
+        <p data-i18n="food.photos"></p>
+      </div>
     </section>
 
     <!-- REGISTRY -->

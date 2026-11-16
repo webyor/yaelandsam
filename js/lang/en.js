@@ -7,8 +7,7 @@ window.LANG = window.LANG || {};
 window.LANG.en = {
   pageTitle: "Yael & Sam · June 20, 2027",
   namesShort: "Yael & Sam",
-  namesFull: "Yael Weber & Sam Matatov",
-  headerMeta: "Sunday, June 20, 2027 • Staten Island, New York",
+  headerMeta: "Sunday, June 20, 2027",
   menu: "Menu",
   photoComing: "Photo coming soon",
 
@@ -16,7 +15,7 @@ window.LANG.en = {
     home: "Home",
     travel: "Travel",
     schedule: "Schedule",
-    food: "Entertainment & Food",
+    food: "Food & Entertainment",
     registry: "Registry",
     faq: "Q & A",
     todo: "Things to Do",
@@ -24,6 +23,7 @@ window.LANG.en = {
 
   home: {
     eyebrow: "We're getting married",
+    eyebrowSub: "and can't wait for you to celebrate with us",
     date: "06.20.27",
     venue: "The Stone House at Clove Lakes · Staten Island, New York",
     photoAlt: "Yael and Sam",
@@ -75,7 +75,7 @@ window.LANG.en = {
   },
 
   food: {
-    title: "Entertainment & Food",
+    title: "Food & Entertainment",
     kosherTitle: "The Food",
     kosher: "All of the food at the reception will be kosher.",
     dietTitle: "Food allergies or dietary needs?",
@@ -83,6 +83,8 @@ window.LANG.en = {
     dietSubmit: "Send",
     danceTitle: "Let's Dance!",
     dance: "We want everyone on the dance floor! Come ready to celebrate with us, bring your best moves (and comfortable shoes), and help us make it a night full of music, dancing and fun.",
+    photosTitle: "Take Pictures!",
+    photos: "We'd love to see the night through your eyes! You'll find QR codes around the venue. Scan one with your phone's camera to add your photos and videos to our shared wedding album, so we can all relive the celebration together.",
   },
 
   registry: {
