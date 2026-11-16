@@ -73,7 +73,11 @@ Make a tab named exactly **Guests**, with these four columns in row 1:
   contact you.
 
 RSVPs land in an **RSVP** tab with one row per person, marked `yes` or `no`.
-If a party replies twice, the newest rows (by timestamp) are the current answer.
+Each party can RSVP only once. If someone from a party that already replied
+tries again, the site asks them to contact you, and the Google account that
+owns the script gets an email with their answers on file. To change a party's
+answer, edit its rows in the RSVP tab. To let them reply again on the site,
+delete their rows.
 
 ### Connecting the Sheet
 

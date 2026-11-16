@@ -42,6 +42,7 @@ window.LANG.en = {
     searching: "Looking you up…",
     notFound: "We couldn't find that name. Please check the spelling, or contact Yael or Sam.",
     multiple: "More than one guest has that name. Please contact Yael or Sam to RSVP.",
+    alreadyReplied: "We already have your party's RSVP. Thank you! To make a change, please contact Yael or Sam.",
     partyOf: "Your party: {n} guest(s). Please reply for each person.",
     notMe: "Not you? Search again",
     email: "Email (optional)",

@@ -15,7 +15,7 @@
   let party = null; // { name, members: [string] } after a successful lookup
 
   /** Error codes the server can return for a lookup, mapped to message keys. */
-  const LOOKUP_ERRORS = { not_found: "rsvp.notFound", multiple: "rsvp.multiple" };
+  const LOOKUP_ERRORS = { not_found: "rsvp.notFound", multiple: "rsvp.multiple", already_replied: "rsvp.alreadyReplied" };
 
   function show(form) {
     findForm.hidden = form !== findForm;
@@ -93,6 +93,12 @@
     setStatus(rsvpForm, "forms.sending", "");
     try {
       const body = await post(rsvpForm);
+      if (body.error === "already_replied") {
+        // Another reply for this party got in first (e.g. a second device).
+        setStatus(rsvpForm, "rsvp.alreadyReplied", "err");
+        button.hidden = true;
+        return;
+      }
       if (!body.ok) throw new Error(body.error || "Server rejected the reply");
       setStatus(rsvpForm, "forms.thanks", "ok");
       button.hidden = true; // done; guests can still use "Not you?" to start over
