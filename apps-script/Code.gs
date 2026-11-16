@@ -193,6 +193,17 @@ function clean(value) {
   return /^[=+\-@]/.test(text) ? "'" + text : text;
 }
 
+/**
+ * Run this once from the Apps Script editor (pick it in the function menu, click Run).
+ * Google then asks for permission to send email, and a test email arrives in your
+ * inbox. Redeploying a web app doesn't always ask for new permissions; running a
+ * function from the editor does.
+ */
+function authorizeEmail() {
+  MailApp.sendEmail(Session.getEffectiveUser().getEmail(), "Wedding RSVP: email alerts are on",
+    "This test confirms the RSVP script can email you when a party tries to RSVP twice.");
+}
+
 function reply(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
 }
