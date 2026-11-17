@@ -28,7 +28,7 @@ window.LANG.en = {
     date: "06.20.27",
     venue: "The Stone House at Clove Lakes · Staten Island, New York",
     photoAlt: "Yael and Sam",
-    rsvpBy: "Kindly RSVP by March 1, 2027.",
+    rsvpBy: "Kindly RSVP by April 15, 2027.",
     rsvpButton: "RSVP",
   },
 
@@ -110,11 +110,13 @@ window.LANG.en = {
     title: "Q & A",
     more: "More Q&A coming soon.",
     items: [
-      { q: "What date should I RSVP by?", a: "Please RSVP by March 1, 2027." },
+      { q: "What date should I RSVP by?", a: "Please RSVP by April 15, 2027." },
       { q: "Where are the ceremony and reception?", a: "Both the ceremony and the reception will be at The Stone House at Clove Lakes, 1150 Clove Road, Staten Island, NY 10301. See the Travel tab for directions." },
       { q: "Will there be transportation to and from the venue?", a: "Details will be added soon." },
       { q: "Have you reserved blocks of rooms at any hotels?", a: "Details will be added soon." },
       { q: "If I have any questions, who can I contact?", a: "Contact details will be added soon." },
+      { q: "Will the ceremony or reception be outdoors?", a: "The ceremony will be outdoors." },
+      { q: "Is there a specific dress code?", a: "Details will be added soon." },
     ],
   },
 
