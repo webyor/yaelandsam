@@ -73,11 +73,26 @@ Make a tab named exactly **Guests**, with these four columns in row 1:
   contact you.
 
 RSVPs land in an **RSVP** tab with one row per person, marked `yes` or `no`.
-Each party can RSVP only once. If someone from a party that already replied
-tries again, the site asks them to contact you, and the Google account that
-owns the script gets an email with their answers on file. To change a party's
-answer, edit its rows in the RSVP tab. To let them reply again on the site,
-delete their rows.
+Each **person** can RSVP only once, but a party doesn't have to answer for
+everyone at the same time. Each person can be marked Joyfully accepts,
+Regretfully declines or Maybe (`yes` / `no` / `maybe` in the sheet), with
+nothing preselected. Anyone left blank isn't saved and can be answered on
+another visit.
+People who already replied show their answer and can't be changed on the site.
+If someone tries to RSVP again for a party where everyone has replied, or to
+re-answer for someone who already replied, the site asks them to contact you,
+and the Google account that owns the script gets an email with the answers on
+file. To change someone's answer, edit their row in the RSVP tab. To let them
+reply again on the site, delete their row.
+
+To check which script version Google is running, send it a `version` request:
+
+```bash
+curl -sL --data-urlencode "formType=version" "<your Web app URL>"
+```
+
+It should answer with the `SCRIPT_VERSION` at the top of `apps-script/Code.gs`.
+An `unknown_form` answer means Google is still running an older copy.
 
 ### Connecting the Sheet
 

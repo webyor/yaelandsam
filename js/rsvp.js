@@ -2,9 +2,12 @@
  * RSVP flow.
  *  1. Guest types their name (#find-form). The Apps Script looks it up in the
  *     Google Sheet's "Guests" tab and returns their party: { name, members: [...] }.
- *  2. #rsvp-form shows the party name, how many people are in it, and a
- *     yes/no choice for each person. Answers are sent as att_0, att_1, ...
- *     The server re-checks the party, so guests can't add names.
+ *  2. #rsvp-form shows the party name, how many people are in it, and for each
+ *     person: Joyfully accepts / Regretfully declines / Maybe, nothing preselected.
+ *     Guests answer for whoever they want; anyone left blank isn't sent and can be
+ *     answered on a later visit. People who already replied show their answer
+ *     instead. Answers go as att_0, att_1, ... ("yes" | "no" | "maybe"); at least
+ *     one is needed. The server refuses answers for anyone who already replied.
  */
 (function () {
   "use strict";
@@ -12,10 +15,13 @@
   const { t, setStatus, post } = window.SITE;
   const findForm = document.getElementById("find-form");
   const rsvpForm = document.getElementById("rsvp-form");
-  let party = null; // { name, members: [string] } after a successful lookup
+  let party = null; // { name, members: [string], answered: { name: "yes"|"no"|"maybe" } } after a lookup
 
   /** Error codes the server can return for a lookup, mapped to message keys. */
   const LOOKUP_ERRORS = { not_found: "rsvp.notFound", multiple: "rsvp.multiple", already_replied: "rsvp.alreadyReplied" };
+
+  /** The answers a guest can give, in display order, with their label keys. */
+  const ANSWER_KEYS = { yes: "rsvp.yes", no: "rsvp.no", maybe: "rsvp.maybe" };
 
   function show(form) {
     findForm.hidden = form !== findForm;
@@ -31,24 +37,40 @@
     return span;
   }
 
-  /** One fieldset per person: their name and Attending / Not attending. */
+  /**
+   * One fieldset per person. Already replied: their name and answer, no choices.
+   * Otherwise: Joyfully accepts / Regretfully declines / Maybe, nothing preselected,
+   * so guests can answer for just the people they want.
+   */
   function memberFieldset(name, i) {
     const fieldset = document.createElement("fieldset");
     const legend = document.createElement("legend");
     legend.textContent = name;
     fieldset.append(legend);
-    [["yes", "rsvp.yes"], ["no", "rsvp.no"]].forEach(([value, key], j) => {
+    const earlier = (party.answered || {})[name];
+    if (earlier) {
+      const done = document.createElement("p");
+      done.className = "muted";
+      done.append(label("rsvp.alreadyIn"), " ", label(ANSWER_KEYS[earlier] || "rsvp.maybe"));
+      fieldset.append(done);
+      return fieldset;
+    }
+    Object.entries(ANSWER_KEYS).forEach(([value, key]) => {
       const wrap = document.createElement("label");
       const radio = document.createElement("input");
       wrap.className = "inline";
       radio.type = "radio";
       radio.name = "att_" + i;
       radio.value = value;
-      radio.required = j === 0; // one required radio makes the whole group required
       wrap.append(radio, " ", label(key));
       fieldset.append(wrap);
     });
     return fieldset;
+  }
+
+  /** True if at least one person has an answer picked. */
+  function hasAnswer() {
+    return rsvpForm.querySelector("input[type=radio]:checked") !== null;
   }
 
   function renderPartySize() {
@@ -88,13 +110,17 @@
 
   async function sendRsvp(event) {
     event.preventDefault();
+    if (!hasAnswer()) {
+      setStatus(rsvpForm, "rsvp.pickOne", "err");
+      return;
+    }
     const button = rsvpForm.querySelector("button[type=submit]");
     button.disabled = true;
     setStatus(rsvpForm, "forms.sending", "");
     try {
       const body = await post(rsvpForm);
       if (body.error === "already_replied") {
-        // Another reply for this party got in first (e.g. a second device).
+        // Someone in this reply was answered first from elsewhere (e.g. a second phone).
         setStatus(rsvpForm, "rsvp.alreadyReplied", "err");
         button.hidden = true;
         return;
