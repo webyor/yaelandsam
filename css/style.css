@@ -179,6 +179,13 @@ main { max-width: 760px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
 .form-status { min-height: 1.5em; font-style: italic; }
 .form-status.ok { color: var(--green-dark); }
 .form-status.err { color: #a03a2a; }
+/* Confirmation box at the top of the home tab after an RSVP is sent. */
+.rsvp-result {
+  margin: 0 auto 1.2rem; max-width: 560px; padding: 0.9rem 1.2rem;
+  background: var(--green-soft); border: 1px solid var(--border); border-radius: var(--radius);
+  color: var(--green-dark); font-style: italic;
+}
+.rsvp-result.err { background: #fbeeea; border-color: #ecc9bf; color: #a03a2a; }
 /* Honeypot: invisible and takes no space in either text direction. */
 /* ".form input.hp" outranks the general ".form input" width:100% rule, which made the page scroll sideways. */
 .hp, .form input.hp { position: absolute; width: 1px; height: 1px; padding: 0; border: 0; overflow: hidden; clip-path: inset(50%); opacity: 0; }

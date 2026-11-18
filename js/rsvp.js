@@ -5,11 +5,18 @@
  *  2. #rsvp-form shows the party name, how many people are in it, and for each
  *     person: Joyfully accepts / Regretfully declines / Maybe, nothing preselected.
  *     Guests answer for whoever they want; anyone left blank isn't sent and can be
- *     answered on a later visit. People with a final answer (yes/no) show it instead
- *     of choices; people who said Maybe see that and can change it. Answers go as
+ *     answered on a later visit. Everyone gets the choices, whether or not they
+ *     already replied; the form doesn't reveal earlier answers. Answers go as
  *     "att:<English full name>" = "yes" | "no" | "maybe", so they match by name, not
- *     position. At least one is needed. The server refuses answers for anyone with a
- *     final answer.
+ *     position. At least one is needed.
+ *  3. The server saves everyone picked except people who already have a final yes/no,
+ *     and returns those as `skipped`. The message then says who already RSVPed and
+ *     whose response was submitted, e.g. "Noa already RSVPed, but the response for
+ *     Hillel was submitted."
+ *  4. After a reply is handled, the forms close and clear, the page goes back to the
+ *     top of the home tab, and the message shows in #rsvp-result. Answering again
+ *     means searching again. If sending fails (e.g. no connection), the form stays
+ *     open with the guest's choices so they can retry.
  */
 (function () {
   "use strict";
@@ -17,8 +24,9 @@
   const { t, setStatus, post } = window.SITE;
   const findForm = document.getElementById("find-form");
   const rsvpForm = document.getElementById("rsvp-form");
+  const resultBox = document.getElementById("rsvp-result");
   // After a lookup: { name, members: [English names], display: [names in the alphabet the
-  // guest searched with], answered: { English name: "yes"|"no"|"maybe" } }
+  // guest searched with] }. (The server also sends `answered`; the form doesn't show it.)
   let party = null;
 
   /** Error codes the server can return for a lookup, mapped to message keys. */
@@ -42,26 +50,15 @@
   }
 
   /**
-   * One fieldset per person. Final answer (yes/no): their name and answer, no choices.
-   * Otherwise: Joyfully accepts / Regretfully declines / Maybe, nothing preselected,
-   * so guests can answer for just the people they want; someone who said Maybe also
-   * sees "Current answer: Maybe". `name` is the English name (sent with the answer and
-   * used to match earlier answers); the legend shows the name in the guest's alphabet.
+   * One fieldset per person: Joyfully accepts / Regretfully declines / Maybe, nothing
+   * preselected, so guests can answer for just the people they want. `name` is the
+   * English name (sent with the answer); the legend shows the name in the guest's alphabet.
    */
   function memberFieldset(name, i) {
     const fieldset = document.createElement("fieldset");
     const legend = document.createElement("legend");
     legend.textContent = (party.display || [])[i] || name;
     fieldset.append(legend);
-    const earlier = (party.answered || {})[name];
-    if (earlier) {
-      const note = document.createElement("p");
-      note.className = "muted";
-      const final = earlier !== "maybe";
-      note.append(label(final ? "rsvp.alreadyIn" : "rsvp.currently"), " ", label(ANSWER_KEYS[earlier] || "rsvp.maybe"));
-      fieldset.append(note);
-      if (final) return fieldset;
-    }
     Object.entries(ANSWER_KEYS).forEach(([value, key]) => {
       const wrap = document.createElement("label");
       const radio = document.createElement("input");
@@ -75,9 +72,9 @@
     return fieldset;
   }
 
-  /** True if at least one person has an answer picked. */
-  function hasAnswer() {
-    return rsvpForm.querySelector("input[type=radio]:checked") !== null;
+  /** English names of the people who have an answer picked. */
+  function pickedNames() {
+    return [...rsvpForm.querySelectorAll("input[type=radio]:checked")].map((r) => r.name.slice("att:".length));
   }
 
   function renderPartySize() {
@@ -115,17 +112,65 @@
     }
   }
 
-  /** English names from the server, shown the way the form shows them (guest's alphabet). */
+  /** English names, shown the way the form shows them (guest's alphabet), joined with commas. */
   function shownNames(englishNames) {
-    return englishNames.map((n) => {
-      const i = party.members.indexOf(n);
-      return (i !== -1 && party.display && party.display[i]) || n;
-    });
+    return englishNames
+      .map((n) => {
+        const i = party.members.indexOf(n);
+        return (i !== -1 && party.display && party.display[i]) || n;
+      })
+      .join(", ");
+  }
+
+  /**
+   * Result message after sending. `picked` = people answered in this reply, `skipped` =
+   * those the server didn't save because they already had a final answer. One skipped
+   * person uses the "...One" wording (singular verb in Hebrew and Russian).
+   *  - none skipped: "Thank you! We received your reply."
+   *  - some skipped: "<skipped> already RSVPed, but the response for <saved> was submitted."
+   *  - all skipped:  "<skipped> already RSVPed, so nothing was changed. ..."
+   * Returns { text, kind } with kind "ok" or "err" (nothing was saved).
+   */
+  function resultMessage(picked, skipped) {
+    const saved = picked.filter((n) => !skipped.includes(n));
+    if (skipped.length === 0) return { text: t("forms.thanks"), kind: "ok" };
+    const one = skipped.length === 1;
+    if (saved.length === 0) {
+      return { text: t(one ? "rsvp.allSkippedOne" : "rsvp.allSkipped").replace("{skipped}", shownNames(skipped)), kind: "err" };
+    }
+    return {
+      text: t(one ? "rsvp.someSkippedOne" : "rsvp.someSkipped")
+        .replace("{skipped}", shownNames(skipped))
+        .replace("{saved}", shownNames(saved)),
+      kind: "ok",
+    };
+  }
+
+  /** Closes and clears both RSVP forms. */
+  function closeForms() {
+    party = null;
+    rsvpForm.reset();
+    findForm.reset();
+    setStatus(rsvpForm, "", "");
+    setStatus(findForm, "", "");
+    findForm.hidden = true;
+    rsvpForm.hidden = true;
+  }
+
+  /** After a reply: close the forms, go back to the top of the home tab and show the message there. */
+  function backHome(message) {
+    closeForms();
+    resultBox.textContent = message.text;
+    resultBox.className = "rsvp-result " + message.kind;
+    resultBox.hidden = false;
+    if (location.hash !== "#home") location.hash = "#home"; // also scrolls to the top (app.js)
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   async function sendRsvp(event) {
     event.preventDefault();
-    if (!hasAnswer()) {
+    const picked = pickedNames();
+    if (picked.length === 0) {
       setStatus(rsvpForm, "rsvp.pickOne", "err");
       return;
     }
@@ -134,27 +179,15 @@
     setStatus(rsvpForm, "forms.sending", "");
     try {
       const body = await post(rsvpForm);
+      let message;
       if (body.error === "already_replied") {
-        // Everyone picked had already been answered elsewhere (e.g. a second phone).
-        setStatus(rsvpForm, "rsvp.pickedReplied", "err");
-        button.hidden = true;
-        return;
+        message = resultMessage(picked, picked); // everyone picked already had a final answer
+      } else if (body.ok) {
+        message = resultMessage(picked, body.skipped || []);
+      } else {
+        throw new Error(body.error || "Server rejected the reply");
       }
-      if (!body.ok) throw new Error(body.error || "Server rejected the reply");
-      setStatus(rsvpForm, "forms.thanks", "ok");
-      // Tell the guest who in the party already had a final answer and kept it: people who
-      // had replied before this visit (their choices were hidden) plus anyone the server
-      // skipped because they were answered meanwhile (e.g. from a second phone).
-      const earlier = party.members.filter((m) => {
-        const a = (party.answered || {})[m];
-        return a && a !== "maybe";
-      });
-      const kept = [...new Set([...earlier, ...(body.skipped || [])])];
-      if (kept.length) {
-        rsvpForm.querySelector(".form-status").textContent +=
-          " " + t("rsvp.someSkipped").replace("{names}", shownNames(kept).join(", "));
-      }
-      button.hidden = true; // done; guests can still use "Not you?" to start over
+      backHome(message);
     } catch (err) {
       console.error("RSVP failed:", err);
       setStatus(rsvpForm, err.notReady ? "forms.notReady" : "forms.error", "err");
@@ -166,12 +199,14 @@
   function startOver() {
     party = null;
     rsvpForm.reset();
-    rsvpForm.querySelector("button[type=submit]").hidden = false;
     findForm.reset();
     show(findForm);
   }
 
-  document.getElementById("open-rsvp").addEventListener("click", () => show(party ? rsvpForm : findForm));
+  document.getElementById("open-rsvp").addEventListener("click", () => {
+    resultBox.hidden = true; // starting a new RSVP: clear the last result
+    show(party ? rsvpForm : findForm);
+  });
   document.getElementById("not-me").addEventListener("click", startOver);
   findForm.addEventListener("submit", findParty);
   rsvpForm.addEventListener("submit", sendRsvp);

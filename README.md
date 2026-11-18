@@ -97,23 +97,28 @@ person can be marked Joyfully accepts, Regretfully declines or Maybe, with
 nothing preselected. Anyone left blank isn't saved and can be answered on
 another visit.
 
-- **Yes and no are final.** That person shows their answer and can't be
-  answered again on the site.
-- **Maybe can be changed.** That person shows "Current answer: Maybe" plus
-  the choices, and a new answer updates their existing row, so each person
-  keeps one row.
+- **Everyone in the party always gets the three choices.** The form doesn't
+  show earlier answers.
+- **After sending, the page goes back to the top of the home tab** and shows
+  the result in a box there. Answering again means clicking RSVP and searching
+  again. If sending fails (for example, no connection), the form stays open
+  with the choices so the guest can retry.
+- **Yes and no are final.** If a reply includes someone who already said yes
+  or no, that person keeps their earlier answer, and everyone else in the reply
+  is saved. The site says, for example, "Noa Weber already RSVPed, but the
+  response for Hillel Weber was submitted." If everyone in the reply had
+  already RSVPed, nothing changes, and the site asks them to contact you.
+- **Maybe can be changed.** A new answer updates that person's existing row,
+  so each person keeps one row.
 - **Answers follow the person, not the party name.** Renaming a party, or
   reordering the Guests tab, doesn't lose or mix up anyone's answer. Renaming a
   *person* (First/Last Name) does disconnect them from their earlier row.
 
-If a reply includes people who already have a final answer (for example, the
-form was open on two phones), those people are skipped and keep their earlier
-answer, everyone else in the reply is saved, and the site lists who was
-skipped. If everyone in the reply was skipped, or a party where everyone has a
-final answer searches again, the site asks them to contact you. The Google account that owns the script gets an email with the answers on
-file, at most once an hour per party, so repeated tries can't flood your inbox.
-To change a final answer, edit that person's row in the RSVP tab. To let them
-reply again on the site, delete their row.
+When a party where everyone has a final answer searches again, the site asks
+them to contact you. Repeat attempts email the Google account that owns the
+script, with the answers on file, at most once an hour per party. To change a
+final answer, edit that person's row in the RSVP tab. To let them reply again
+on the site, delete their row.
 
 To check which script version Google is running, send it a `version` request:
 
