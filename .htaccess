@@ -1,0 +1,11 @@
+# Apache settings for the GoDaddy (cPanel) copy of the site. GitHub Pages ignores this file.
+#
+# Browsers must re-check index.html on every visit, so they always see the newest
+# ?v=<fingerprint> links to the CSS and JS files (see tools/stamp_assets.py).
+# The fingerprinted CSS/JS files themselves can be cached normally: when they change,
+# their link changes, so the browser fetches the new copy.
+<IfModule mod_headers.c>
+  <FilesMatch "\.html$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+</IfModule>

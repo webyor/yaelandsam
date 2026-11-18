@@ -14,7 +14,22 @@ no build step, available in English, Hebrew and Russian.
 | `js/config.js` | RSVP endpoint URL and the countdown time |
 | `js/app.js` | Tabs, language switch, countdown, form sending |
 | `apps-script/Code.gs` | Google Apps Script that saves form replies into a Google Sheet |
+| `js/gate.js`, `js/rsvp.js` | Passcode screen; RSVP lookup and form |
 | `images/` | Photos |
+| `tools/stamp_assets.py` | Adds `?v=` fingerprints to CSS/JS links so browsers load new files |
+| `.htaccess` | GoDaddy only: makes browsers re-check `index.html` on every visit |
+
+### After changing any CSS or JS file
+
+Run this from the repo root before committing:
+
+```bash
+python tools/stamp_assets.py
+```
+
+It gives every stylesheet and script link in `index.html` a fingerprint of
+the file's contents, for example `js/rsvp.js?v=5ba74585`. A changed file gets a
+new link, so guests' browsers download it instead of reusing an old saved copy.
 
 ## Editing content
 
