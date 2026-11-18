@@ -15,10 +15,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Great+Vibes&family=Frank+Ruhl+Libre:wght@400;500&family=Marck+Script&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=32995e72">
+  <link rel="stylesheet" href="css/style.css?v=5ecdfad4">
 </head>
-<!-- "locked" hides the site until the passcode is entered (js/gate.js). -->
-<body class="locked">
+<!--
+  "choose-lang" shows the language screen first; app.js removes it once a language
+  has been chosen (or was chosen on an earlier visit).
+  "locked" hides the site until the passcode is entered (js/gate.js).
+-->
+<body class="choose-lang locked">
   <header class="site-header">
     <div class="lang-switch" role="group" aria-label="Language">
       <button type="button" data-lang="en">English</button>
@@ -38,6 +42,29 @@
       <a href="#todo" data-i18n="nav.todo"></a>
     </nav>
   </header>
+
+  <!--
+    Language screen, shown first while the body has class "choose-lang".
+    Written in all three languages, since no language has been picked yet.
+  -->
+  <section id="lang-picker" class="lang-picker" aria-labelledby="lang-picker-title">
+    <img class="sprig" src="images/flower.png" alt="" width="692" height="174">
+    <h2 id="lang-picker-title" class="lang-picker-welcome">
+      <span lang="en">Welcome</span>
+      <span lang="he" dir="rtl">ברוכים הבאים</span>
+      <span lang="ru">Добро пожаловать</span>
+    </h2>
+    <p class="lang-picker-ask">
+      <span lang="en">Please choose a language</span>
+      <span lang="he" dir="rtl">נא לבחור שפה</span>
+      <span lang="ru">Пожалуйста, выберите язык</span>
+    </p>
+    <div class="lang-picker-buttons">
+      <button type="button" class="btn" data-pick-lang="en" lang="en">English</button>
+      <button type="button" class="btn" data-pick-lang="he" lang="he">עברית</button>
+      <button type="button" class="btn" data-pick-lang="ru" lang="ru">Русский</button>
+    </div>
+  </section>
 
   <!-- Passcode screen, shown while the body has class "locked". -->
   <section id="gate" class="gate">
@@ -201,7 +228,7 @@
   <script src="js/lang/en.js?v=07bfc5d8"></script>
   <script src="js/lang/he.js?v=905bbbf5"></script>
   <script src="js/lang/ru.js?v=5a38f3b4"></script>
-  <script src="js/app.js?v=32e63afb"></script>
+  <script src="js/app.js?v=556d0120"></script>
   <script src="js/gate.js?v=3899f6ee"></script>
   <script src="js/rsvp.js?v=a6db0ee4"></script>
 </body>

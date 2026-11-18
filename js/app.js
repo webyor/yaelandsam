@@ -31,7 +31,12 @@
     try { return localStorage.getItem(LANG_KEY); } catch (e) { return null; }
   }
 
-  function setLang(code) {
+  /**
+   * Shows the site in `code` ("en" | "he" | "ru"). `remember` saves it as the guest's
+   * choice; the first-load default is not saved, so the language screen still appears
+   * until the guest actually picks a language.
+   */
+  function setLang(code, remember) {
     if (!LANGS[code]) code = config.DEFAULT_LANG;
     current = LANGS[code];
     document.documentElement.lang = code;
@@ -43,7 +48,15 @@
     renderFaq();
     renderTodo();
     document.dispatchEvent(new Event("langchange"));
+    if (!remember) return;
     try { localStorage.setItem(LANG_KEY, code); } catch (e) { /* storage blocked: language just won't be remembered */ }
+  }
+
+  /** Language screen: picking a language applies and remembers it, then reveals the passcode screen (or the site). */
+  function pickLang(code) {
+    setLang(code, true);
+    document.body.classList.remove("choose-lang");
+    window.scrollTo(0, 0);
   }
 
   /** Q&A list: each item is { q, a } in the language file. */
@@ -168,7 +181,8 @@
     if (img.complete && img.naturalWidth === 0) markMissing();
   });
 
-  document.querySelectorAll("[data-lang]").forEach((b) => b.addEventListener("click", () => setLang(b.dataset.lang)));
+  document.querySelectorAll("[data-lang]").forEach((b) => b.addEventListener("click", () => setLang(b.dataset.lang, true)));
+  document.querySelectorAll("[data-pick-lang]").forEach((b) => b.addEventListener("click", () => pickLang(b.dataset.pickLang)));
 
   document.querySelector(".menu-toggle").addEventListener("click", (e) => {
     const nav = document.getElementById("site-nav");
@@ -179,7 +193,10 @@
   document.getElementById("diet-form").addEventListener("submit", submitDiet);
   window.addEventListener("hashchange", showTab);
 
-  setLang(savedLang() || config.DEFAULT_LANG);
+  // A language chosen on an earlier visit skips the language screen.
+  const chosen = savedLang();
+  setLang(chosen || config.DEFAULT_LANG, false);
+  if (chosen) document.body.classList.remove("choose-lang");
   showTab();
   tickCountdown();
   setInterval(tickCountdown, 1000);

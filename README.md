@@ -51,6 +51,14 @@ Save the photos with these exact names, and they replace the placeholders:
 
 The venue picture on the Travel tab uses `images/save-the-date.jpg`.
 
+## Language screen
+
+On a guest's first visit, the site opens on a welcome screen, written in all
+three languages, where they choose English, Hebrew or Russian. The passcode
+screen and the site then appear in that language. The choice is remembered in
+the browser, so later visits skip this screen. The language buttons at the
+top of the site still switch languages at any time.
+
 ## Passcode
 
 Guests must type the passcode (`Y&S2027`, not case-sensitive) before the
