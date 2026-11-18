@@ -13,7 +13,8 @@
  *  - "Dietary" (created automatically): food allergies and restrictions.
  *
  * Requests the website sends (formType):
- *  - lookup:  name   -> { ok, party: { name, members: [full names], answered: { name: "yes"|"no"|"maybe" } } }
+ *  - lookup:  name   -> { ok, party: { name, members: [English full names], display: [names in the
+ *               alphabet the guest searched with], answered: { name: "yes"|"no"|"maybe" } } }
  *  - rsvp:    party, att_0.. ("yes" | "no" | "maybe", or blank) -> one RSVP row per answered person
  *  - dietary: name, dietary -> one Dietary row
  *  - version             -> { ok, version } (lets the site owner check which script is deployed)
@@ -25,7 +26,7 @@
  */
 
 /** Bump when this file changes, so a "version" request shows whether Google runs the latest copy. */
-var SCRIPT_VERSION = "2026-11-17-yes-no-maybe";
+var SCRIPT_VERSION = "2026-11-17-names-by-language";
 
 var GUESTS_SHEET = "Guests";
 var RSVP_SHEET = { sheet: "RSVP", header: ["timestamp", "party", "guest", "attending", "email", "message", "lang"] };
@@ -63,26 +64,53 @@ function normalize(name) {
     .trim();
 }
 
-/** Reads the Guests tab into { partyName: [full names] } plus a name -> party index. */
+/**
+ * Reads the Guests tab into:
+ *  - parties:   { partyName: [English full names] }  (what the RSVP tab records)
+ *  - spellings: { partyName: [[other spellings of member 0], [... member 1], ...] }
+ *  - index:     normalized name (any spelling) -> list of party names
+ */
 function readGuests() {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(GUESTS_SHEET);
   if (!sheet) throw new Error('Missing "' + GUESTS_SHEET + '" tab');
   var rows = sheet.getDataRange().getValues().slice(1); // skip header row
   var parties = {};
+  var spellings = {};
   var index = {}; // normalized name -> list of party names
   rows.forEach(function (r) {
     var party = String(r[0]).trim();
     var full = (String(r[1]).trim() + " " + String(r[2]).trim()).trim();
     if (!party || !full) return; // blank or half-filled row
+    var others = String(r[3] || "").split(";").map(function (n) { return n.trim(); }).filter(String);
     (parties[party] = parties[party] || []).push(full);
-    [full].concat(String(r[3] || "").split(";")).forEach(function (n) {
+    (spellings[party] = spellings[party] || []).push(others);
+    [full].concat(others).forEach(function (n) {
       var key = normalize(n);
       if (!key) return;
       index[key] = index[key] || [];
       if (index[key].indexOf(party) === -1) index[key].push(party);
     });
   });
-  return { parties: parties, index: index };
+  return { parties: parties, spellings: spellings, index: index };
+}
+
+/** Which alphabet a typed name uses: "hebrew", "cyrillic" or "latin". */
+function alphabetOf(text) {
+  if (/\p{Script=Hebrew}/u.test(text)) return "hebrew";
+  if (/\p{Script=Cyrillic}/u.test(text)) return "cyrillic";
+  return "latin";
+}
+
+/**
+ * Names to show the guest, in the alphabet they searched with: each member's first
+ * Other Spelling in that alphabet, or their English name if there isn't one.
+ */
+function displayNames(members, others, alphabet) {
+  if (alphabet === "latin") return members.slice();
+  return members.map(function (m, i) {
+    var match = (others[i] || []).filter(function (n) { return alphabetOf(n) === alphabet; })[0];
+    return match || m;
+  });
 }
 
 /**
@@ -106,7 +134,8 @@ function lookup(name, lang) {
   }
   var shown = {};
   members.forEach(function (m) { if (answered[m]) shown[m] = answered[m].attending; });
-  return { ok: true, party: { name: party, members: members, answered: shown } };
+  var display = displayNames(members, guests.spellings[party], alphabetOf(String(name)));
+  return { ok: true, party: { name: party, members: members, display: display, answered: shown } };
 }
 
 // ---------- Saving replies ----------

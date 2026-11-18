@@ -69,6 +69,10 @@ Make a tab named exactly **Guests**, with these four columns in row 1:
   accents don't matter.
 - **Other Spellings** is optional: other full names to accept, separated by
   `;`. Use it for Hebrew or Russian spellings and nicknames.
+- Names on the RSVP form follow the alphabet the guest searched with. Search
+  in Hebrew, and each person shows their Hebrew spelling from this column. Same
+  for Russian. Anyone without a spelling in that alphabet shows their English
+  name. The RSVP tab always records the English name (First Name + Last Name).
 - If two parties have someone with the same name, that guest is asked to
   contact you.
 

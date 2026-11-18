@@ -15,7 +15,9 @@
   const { t, setStatus, post } = window.SITE;
   const findForm = document.getElementById("find-form");
   const rsvpForm = document.getElementById("rsvp-form");
-  let party = null; // { name, members: [string], answered: { name: "yes"|"no"|"maybe" } } after a lookup
+  // After a lookup: { name, members: [English names], display: [names in the alphabet the
+  // guest searched with], answered: { English name: "yes"|"no"|"maybe" } }
+  let party = null;
 
   /** Error codes the server can return for a lookup, mapped to message keys. */
   const LOOKUP_ERRORS = { not_found: "rsvp.notFound", multiple: "rsvp.multiple", already_replied: "rsvp.alreadyReplied" };
@@ -40,12 +42,13 @@
   /**
    * One fieldset per person. Already replied: their name and answer, no choices.
    * Otherwise: Joyfully accepts / Regretfully declines / Maybe, nothing preselected,
-   * so guests can answer for just the people they want.
+   * so guests can answer for just the people they want. `name` is the English name
+   * (used to match earlier answers); the legend shows the name in the guest's alphabet.
    */
   function memberFieldset(name, i) {
     const fieldset = document.createElement("fieldset");
     const legend = document.createElement("legend");
-    legend.textContent = name;
+    legend.textContent = (party.display || [])[i] || name;
     fieldset.append(legend);
     const earlier = (party.answered || {})[name];
     if (earlier) {
