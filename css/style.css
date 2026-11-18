@@ -251,6 +251,9 @@ html[dir="rtl"] .site-footer::after { transform: rotate(180deg) scaleX(-1); }
 @media (max-width: 640px) {
   body { font-size: 1.1rem; outline-offset: -8px; border-width: 3px; }
   .site-header { padding-top: 1.2rem; }
+  /* Long one-word headings (e.g. Russian "ПРЕДВАРИТЕЛЬНАЯ") must fit a phone screen:
+     smaller, tighter spacing, and break inside a word only if it still doesn't fit. */
+  h2 { font-size: 1.55rem; letter-spacing: 0.08em; overflow-wrap: break-word; }
   .site-header::before, .site-footer::after { width: 130px; height: 72px; background-size: 320px auto; }
   /* Room under the names so the corner flowers don't cover them. */
   .site-footer { padding-bottom: 5rem; }
