@@ -110,7 +110,7 @@ window.LANG.en = {
 
   registry: {
     title: "Registry",
-    body: "Your presence is the greatest gift. Registry details will be added here soon.",
+    button: "View our registry on Zola",
   },
 
   faq: {

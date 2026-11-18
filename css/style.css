@@ -105,6 +105,8 @@ body.locked main, body.locked .site-nav, body.locked .menu-toggle, body.locked .
 body:not(.locked) .gate { display: none; }
 .gate { max-width: 460px; margin: 2rem auto 4rem; padding: 0 1rem; text-align: center; }
 .gate .card { text-align: center; }
+/* Registry: centred text with the Zola button underneath. */
+.card.registry-card { text-align: center; } /* ".card.registry-card" outranks the general .card text-align */
 
 /* ---------- Language screen (shown first; app.js removes body.choose-lang) ---------- */
 /* While choosing, show only the header names and this screen. */
