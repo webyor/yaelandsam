@@ -105,9 +105,11 @@ another visit.
   with the choices so the guest can retry.
 - **Yes and no are final.** If a reply includes someone who already said yes
   or no, that person keeps their earlier answer, and everyone else in the reply
-  is saved. The site says, for example, "Noa Weber already RSVPed, but the
-  response for Hillel Weber was submitted." If everyone in the reply had
-  already RSVPed, nothing changes, and the site asks them to contact you.
+  is saved. The site says, for example, "Thank you! We received the response
+  for Hillel Weber. Noa Weber already RSVPed. If you need to make a change,
+  please reach out to Yael or Sam." Several names are listed as "A, B and C".
+  If everyone in the reply had already RSVPed, nothing changes, and only the
+  "already RSVPed" part is shown.
 - **Maybe can be changed.** A new answer updates that person's existing row,
   so each person keeps one row.
 - **Answers follow the person, not the party name.** Renaming a party, or

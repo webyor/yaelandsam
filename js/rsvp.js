@@ -10,9 +10,10 @@
  *     "att:<English full name>" = "yes" | "no" | "maybe", so they match by name, not
  *     position. At least one is needed.
  *  3. The server saves everyone picked except people who already have a final yes/no,
- *     and returns those as `skipped`. The message then says who already RSVPed and
- *     whose response was submitted, e.g. "Noa already RSVPed, but the response for
- *     Hillel was submitted."
+ *     and returns those as `skipped`. The message then thanks them for whoever was
+ *     saved and names who already RSVPed, e.g. "Thank you! We received the response for
+ *     Hillel. Noa already RSVPed. If you need to make a change, please reach out to
+ *     Yael or Sam."
  *  4. After a reply is handled, the forms close and clear, the page goes back to the
  *     top of the home tab, and the message shows in #rsvp-result. Answering again
  *     means searching again. If sending fails (e.g. no connection), the form stays
@@ -112,38 +113,45 @@
     }
   }
 
-  /** English names, shown the way the form shows them (guest's alphabet), joined with commas. */
+  /** English names, shown the way the form shows them (in the guest's alphabet). */
   function shownNames(englishNames) {
-    return englishNames
-      .map((n) => {
-        const i = party.members.indexOf(n);
-        return (i !== -1 && party.display && party.display[i]) || n;
-      })
-      .join(", ");
+    return englishNames.map((n) => {
+      const i = party.members.indexOf(n);
+      return (i !== -1 && party.display && party.display[i]) || n;
+    });
+  }
+
+  /**
+   * Joins names for a sentence: "A", "A and B", "A, B and C" (and the Hebrew/Russian
+   * equivalents). In Hebrew "ו" attaches to a Hebrew name ("ואיילת") but takes a hyphen
+   * before a name in another alphabet ("ו-Ayelet").
+   */
+  function joinNames(names) {
+    if (names.length < 2) return names.join("");
+    const last = names[names.length - 1];
+    let and = t("rsvp.and");
+    if (document.documentElement.lang === "he" && !/\p{Script=Hebrew}/u.test(last)) and = " ו-";
+    return names.slice(0, -1).join(", ") + and + last;
   }
 
   /**
    * Result message after sending. `picked` = people answered in this reply, `skipped` =
-   * those the server didn't save because they already had a final answer. One skipped
-   * person uses the "...One" wording (singular verb in Hebrew and Russian).
+   * those the server didn't save because they already had a final answer.
    *  - none skipped: "Thank you! We received your reply."
-   *  - some skipped: "<skipped> already RSVPed, but the response for <saved> was submitted."
-   *  - all skipped:  "<skipped> already RSVPed, so nothing was changed. ..."
-   * Returns { text, kind } with kind "ok" or "err" (nothing was saved).
+   *  - some skipped: "Thank you! We received the response for <saved>. <skipped> already
+   *                  RSVPed. If you need to make a change, please reach out to Yael or Sam."
+   *  - all skipped:  "<skipped> already RSVPed. If you need to make a change, ..."
+   * One skipped person uses "alreadyOne" (singular verb in Hebrew and Russian).
+   * Returns { text, kind } with kind "ok", or "err" when nothing was saved.
    */
   function resultMessage(picked, skipped) {
-    const saved = picked.filter((n) => !skipped.includes(n));
     if (skipped.length === 0) return { text: t("forms.thanks"), kind: "ok" };
-    const one = skipped.length === 1;
-    if (saved.length === 0) {
-      return { text: t(one ? "rsvp.allSkippedOne" : "rsvp.allSkipped").replace("{skipped}", shownNames(skipped)), kind: "err" };
-    }
-    return {
-      text: t(one ? "rsvp.someSkippedOne" : "rsvp.someSkipped")
-        .replace("{skipped}", shownNames(skipped))
-        .replace("{saved}", shownNames(saved)),
-      kind: "ok",
-    };
+    const saved = picked.filter((n) => !skipped.includes(n));
+    const already = t(skipped.length === 1 ? "rsvp.alreadyOne" : "rsvp.alreadyMany")
+      .replace("{skipped}", joinNames(shownNames(skipped)));
+    if (saved.length === 0) return { text: already, kind: "err" };
+    const thanks = t("rsvp.savedFor").replace("{saved}", joinNames(shownNames(saved)));
+    return { text: thanks + " " + already, kind: "ok" };
   }
 
   /** Closes and clears both RSVP forms. */
