@@ -10,7 +10,7 @@
  * on June 20, 2027, when the cocktail hour starts.
  */
 window.SITE_CONFIG = Object.freeze({
-  FORM_ENDPOINT: "https://script.google.com/macros/s/AKfycbz6kprlzjp3kGwy0KZF3u096TyXjo2bthkHg6X3cosDlgtyY7kFcbszxJTTb9pMLfPD/exec",
+  FORM_ENDPOINT: "https://script.google.com/macros/s/AKfycbyH-15el-rKFqw5ghwxMjFMofvC8zWT1uD2yAKUh8lhUFeIVpsba0nJSTrxrCiawayz/exec",
   WEDDING_START: "2027-06-20T18:00:00-04:00",
   DEFAULT_LANG: "en",
 });
