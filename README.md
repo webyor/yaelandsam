@@ -76,17 +76,26 @@ Make a tab named exactly **Guests**, with these four columns in row 1:
 - If two parties have someone with the same name, that guest is asked to
   contact you.
 
-RSVPs land in an **RSVP** tab with one row per person, marked `yes` or `no`.
-Each **person** can RSVP only once, but a party doesn't have to answer for
-everyone at the same time. Each person can be marked Joyfully accepts,
-Regretfully declines or Maybe (`yes` / `no` / `maybe` in the sheet), with
+RSVPs land in an **RSVP** tab with one row per person, marked `yes`, `no` or
+`maybe`. A party doesn't have to answer for everyone at the same time. Each
+person can be marked Joyfully accepts, Regretfully declines or Maybe, with
 nothing preselected. Anyone left blank isn't saved and can be answered on
 another visit.
-People who already replied show their answer and can't be changed on the site.
-If someone tries to RSVP again for a party where everyone has replied, or to
-re-answer for someone who already replied, the site asks them to contact you,
-and the Google account that owns the script gets an email with the answers on
-file. To change someone's answer, edit their row in the RSVP tab. To let them
+
+- **Yes and no are final.** That person shows their answer and can't be
+  answered again on the site.
+- **Maybe can be changed.** That person shows "Current answer: Maybe" plus
+  the choices, and a new answer updates their existing row, so each person
+  keeps one row.
+- **Answers follow the person, not the party name.** Renaming a party, or
+  reordering the Guests tab, doesn't lose or mix up anyone's answer. Renaming a
+  *person* (First/Last Name) does disconnect them from their earlier row.
+
+If someone tries to RSVP again for a party where everyone has a final answer,
+or to re-answer for someone with a final answer, the site asks them to contact
+you. The Google account that owns the script gets an email with the answers on
+file, at most once an hour per party, so repeated tries can't flood your inbox.
+To change a final answer, edit that person's row in the RSVP tab. To let them
 reply again on the site, delete their row.
 
 To check which script version Google is running, send it a `version` request:

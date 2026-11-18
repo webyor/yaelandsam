@@ -5,9 +5,11 @@
  *  2. #rsvp-form shows the party name, how many people are in it, and for each
  *     person: Joyfully accepts / Regretfully declines / Maybe, nothing preselected.
  *     Guests answer for whoever they want; anyone left blank isn't sent and can be
- *     answered on a later visit. People who already replied show their answer
- *     instead. Answers go as att_0, att_1, ... ("yes" | "no" | "maybe"); at least
- *     one is needed. The server refuses answers for anyone who already replied.
+ *     answered on a later visit. People with a final answer (yes/no) show it instead
+ *     of choices; people who said Maybe see that and can change it. Answers go as
+ *     "att:<English full name>" = "yes" | "no" | "maybe", so they match by name, not
+ *     position. At least one is needed. The server refuses answers for anyone with a
+ *     final answer.
  */
 (function () {
   "use strict";
@@ -40,10 +42,11 @@
   }
 
   /**
-   * One fieldset per person. Already replied: their name and answer, no choices.
+   * One fieldset per person. Final answer (yes/no): their name and answer, no choices.
    * Otherwise: Joyfully accepts / Regretfully declines / Maybe, nothing preselected,
-   * so guests can answer for just the people they want. `name` is the English name
-   * (used to match earlier answers); the legend shows the name in the guest's alphabet.
+   * so guests can answer for just the people they want; someone who said Maybe also
+   * sees "Current answer: Maybe". `name` is the English name (sent with the answer and
+   * used to match earlier answers); the legend shows the name in the guest's alphabet.
    */
   function memberFieldset(name, i) {
     const fieldset = document.createElement("fieldset");
@@ -52,18 +55,19 @@
     fieldset.append(legend);
     const earlier = (party.answered || {})[name];
     if (earlier) {
-      const done = document.createElement("p");
-      done.className = "muted";
-      done.append(label("rsvp.alreadyIn"), " ", label(ANSWER_KEYS[earlier] || "rsvp.maybe"));
-      fieldset.append(done);
-      return fieldset;
+      const note = document.createElement("p");
+      note.className = "muted";
+      const final = earlier !== "maybe";
+      note.append(label(final ? "rsvp.alreadyIn" : "rsvp.currently"), " ", label(ANSWER_KEYS[earlier] || "rsvp.maybe"));
+      fieldset.append(note);
+      if (final) return fieldset;
     }
     Object.entries(ANSWER_KEYS).forEach(([value, key]) => {
       const wrap = document.createElement("label");
       const radio = document.createElement("input");
       wrap.className = "inline";
       radio.type = "radio";
-      radio.name = "att_" + i;
+      radio.name = "att:" + name;
       radio.value = value;
       wrap.append(radio, " ", label(key));
       fieldset.append(wrap);

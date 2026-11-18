@@ -44,6 +44,7 @@ window.LANG.en = {
     multiple: "More than one guest has that name. Please contact Yael or Sam to RSVP.",
     alreadyReplied: "Everyone in your party has already replied. Thank you! To make a change, please contact Yael or Sam.",
     alreadyIn: "Already replied:",
+    currently: "Current answer:",
     pickOne: "Please choose an answer for at least one person.",
     partyOf: "Your party: {n} guest(s). Answer for anyone you like. It's fine to leave someone blank.",
     notMe: "Not you? Search again",

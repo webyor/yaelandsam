@@ -7,26 +7,28 @@
  *      One row per person. Everyone with the same Party value is one party.
  *      Other Spellings is optional: extra full names to accept, separated by ";"
  *      (for example a Hebrew or Russian spelling).
- *  - "RSVP"    (created automatically): one row per person. Each PERSON can
- *      reply only once; a party may answer for some people now (yes, no or maybe)
- *      and leave the rest blank to answer later. To change an answer, edit or delete that person's row here.
+ *  - "RSVP"    (created automatically): one row per person, keyed by their English
+ *      full name. "yes"/"no" are final: that person can't be answered again on the
+ *      site. "maybe" can later be changed to another answer (the same row is
+ *      updated). A party may answer for some people and leave the rest blank. To
+ *      change a final answer, edit or delete that person's row here.
  *  - "Dietary" (created automatically): food allergies and restrictions.
  *
  * Requests the website sends (formType):
  *  - lookup:  name   -> { ok, party: { name, members: [English full names], display: [names in the
  *               alphabet the guest searched with], answered: { name: "yes"|"no"|"maybe" } } }
- *  - rsvp:    party, att_0.. ("yes" | "no" | "maybe", or blank) -> one RSVP row per answered person
+ *  - rsvp:    party, "att:<English full name>" = "yes" | "no" | "maybe" for each person answered
  *  - dietary: name, dietary -> one Dietary row
  *  - version             -> { ok, version } (lets the site owner check which script is deployed)
- * If everyone in the party already replied (lookup), or the form tries to answer for
- * someone who already replied (rsvp), the reply is { ok: false, error: "already_replied" }
- * and the script owner gets an email.
+ * If everyone in the party has a final answer (lookup), or the form tries to answer
+ * for someone with a final answer (rsvp), the reply is { ok: false, error: "already_replied" }
+ * and the script owner gets an email, at most once an hour per party.
  *
  * Setup is in README.md ("RSVP setup").
  */
 
 /** Bump when this file changes, so a "version" request shows whether Google runs the latest copy. */
-var SCRIPT_VERSION = "2026-11-17-names-by-language";
+var SCRIPT_VERSION = "2026-11-17-maybe-changeable";
 
 var GUESTS_SHEET = "Guests";
 var RSVP_SHEET = { sheet: "RSVP", header: ["timestamp", "party", "guest", "attending", "email", "message", "lang"] };
@@ -114,8 +116,9 @@ function displayNames(members, others, alphabet) {
 }
 
 /**
- * Finds the one party a typed full name belongs to, with who in it has already
- * replied. If everyone has, the guest is turned away and the owner is emailed.
+ * Finds the one party a typed full name belongs to, with each member's answer so
+ * far. If everyone has a final answer (yes/no), the guest is turned away and the
+ * owner is emailed (at most once an hour per party).
  */
 function lookup(name, lang) {
   var key = normalize(name);
@@ -126,9 +129,8 @@ function lookup(name, lang) {
   if (matches.length > 1) return { ok: false, error: "multiple" }; // same name in two parties
   var party = matches[0];
   var members = guests.parties[party];
-  var answered = answersFor(party);
-  var open = members.filter(function (m) { return !answered[m]; });
-  if (open.length === 0) {
+  var answered = answersFor(members);
+  if (members.every(function (m) { return isFinal(answered[m]); })) {
     notifyRepeat(party, "Name typed: " + clean(name), lang, answered);
     return { ok: false, error: "already_replied" };
   }
@@ -140,29 +142,44 @@ function lookup(name, lang) {
 
 // ---------- Saving replies ----------
 
+/** "yes" and "no" are final; "maybe" can still be changed on the site. */
+function isFinal(answer) {
+  return !!answer && answer.attending !== "maybe";
+}
+
 /**
- * Answers already in the RSVP tab for this party, keyed by guest name:
- * { "Yael Weber": { attending: "yes", when: Date } }. The first answer per person counts.
+ * Current answers for these people, keyed by English full name:
+ * { "Yael Weber": { attending: "yes", when: Date, row: 5 } } (row = sheet row number).
+ * Matched by person, not by party name, so renaming a party in the Guests tab keeps
+ * its answers. If a person somehow has several rows, the last one counts.
  */
-function answersFor(party) {
+function answersFor(members) {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(RSVP_SHEET.sheet);
   var found = {};
   if (!sheet || sheet.getLastRow() < 2) return found;
-  sheet.getDataRange().getValues().slice(1).forEach(function (r) {
+  sheet.getDataRange().getValues().forEach(function (r, i) {
     var guest = String(r[2]).trim();
-    if (String(r[1]).trim() === party && guest && !found[guest]) {
-      found[guest] = { attending: String(r[3]), when: r[0] };
+    if (i > 0 && members.indexOf(guest) !== -1) {
+      found[guest] = { attending: String(r[3]), when: r[0], row: i + 1 };
     }
   });
   return found;
 }
 
 /**
- * Emails the script owner (the Google account that deployed it) about a repeat
- * RSVP attempt. A failed email is logged, never shown to the guest.
+ * Emails the script owner (the Google account that deployed it) about a repeat RSVP
+ * attempt, at most once per party per ALERT_EVERY_SECONDS; repeats inside that
+ * window are still blocked, just not emailed again. A failed email is logged,
+ * never shown to the guest.
  */
+var ALERT_EVERY_SECONDS = 3600; // once an hour per party (chosen by the couple)
+
 function notifyRepeat(party, detail, lang, answered) {
   try {
+    var cache = CacheService.getScriptCache();
+    var key = "alert:" + party;
+    if (cache.get(key)) return;
+    cache.put(key, "1", ALERT_EVERY_SECONDS);
     var lines = Object.keys(answered).map(function (g) {
       return "  - " + g + ": " + answered[g].attending + "  (" + answered[g].when + ")";
     });
@@ -175,7 +192,8 @@ function notifyRepeat(party, detail, lang, answered) {
         "Time: " + new Date() + "\n\n" +
         "Answers on file:\n" + lines.join("\n") + "\n\n" +
         "They were asked to contact you. To change someone's answer, edit or delete " +
-        "their row in the RSVP tab; once deleted, they can RSVP again on the site.",
+        "their row in the RSVP tab; once deleted, they can RSVP again on the site.\n" +
+        "(More tries for this party within the next hour are blocked without another email.)",
     });
   } catch (err) {
     console.error("Repeat-RSVP email failed for " + party + ": " + err);
@@ -183,31 +201,46 @@ function notifyRepeat(party, detail, lang, answered) {
 }
 
 /**
- * Saves one RSVP row per person answered "yes", "no" or "maybe"; anyone left blank is
- * skipped, so they can be answered another time. Member names come from the sheet, not the
- * browser. Refuses the whole reply if it answers for someone who already replied.
+ * Saves the answers sent as "att:<English full name>" = "yes" | "no" | "maybe".
+ * Answers are matched by name, so a Guests tab edited between lookup and submit
+ * can't put an answer on the wrong person. People left out are skipped. A person
+ * whose answer is "maybe" can change it: their row is updated in place, so each
+ * person keeps one row. Anyone with a final yes/no can't be answered again: the
+ * whole reply is refused and the owner is emailed.
  */
 function saveRsvp(p) {
   var party = String(p.party || "").trim();
   var members = readGuests().parties[party];
   if (!members) return { ok: false, error: "unknown_party" };
-  var answers = members.map(function (_, i) { return String(p["att_" + i] || ""); });
-  if (answers.some(function (a) { return ["yes", "no", "maybe", ""].indexOf(a) === -1; })) {
-    return { ok: false, error: "bad_answer" };
+  var picked = {};
+  for (var k in p) {
+    if (k.indexOf("att:") !== 0) continue;
+    var guest = k.slice(4);
+    if (members.indexOf(guest) === -1) return { ok: false, error: "unknown_guest" };
+    if (["yes", "no", "maybe"].indexOf(p[k]) === -1) return { ok: false, error: "bad_answer" };
+    picked[guest] = p[k];
   }
-  var picked = members.filter(function (_, i) { return answers[i] !== ""; });
-  if (picked.length === 0) return { ok: false, error: "missing_answer" };
+  var names = Object.keys(picked);
+  if (names.length === 0) return { ok: false, error: "missing_answer" };
   var now = new Date();
-  var rows = members
-    .map(function (m, i) { return [now, clean(party), clean(m), answers[i], clean(p.email), clean(p.message), clean(p.lang)]; })
-    .filter(function (_, i) { return answers[i] !== ""; });
+  var rowFor = function (g) {
+    return [now, clean(party), clean(g), picked[g], clean(p.email), clean(p.message), clean(p.lang)];
+  };
 
   // Check and write under one lock, so two replies for the same person at once can't both get in.
   var clash = withLock(function () {
-    var answered = answersFor(party);
-    if (picked.some(function (m) { return answered[m]; })) return answered;
+    var answered = answersFor(members);
+    if (names.some(function (g) { return isFinal(answered[g]); })) return answered;
     var sheet = getSheet(RSVP_SHEET);
-    sheet.getRange(sheet.getLastRow() + 1, 1, rows.length, rows[0].length).setValues(rows);
+    var fresh = [];
+    names.forEach(function (g) {
+      if (answered[g]) {
+        sheet.getRange(answered[g].row, 1, 1, RSVP_SHEET.header.length).setValues([rowFor(g)]); // was "maybe"
+      } else {
+        fresh.push(rowFor(g));
+      }
+    });
+    if (fresh.length) sheet.getRange(sheet.getLastRow() + 1, 1, fresh.length, fresh[0].length).setValues(fresh);
     return null;
   });
   if (clash) {
