@@ -106,9 +106,11 @@ another visit.
   reordering the Guests tab, doesn't lose or mix up anyone's answer. Renaming a
   *person* (First/Last Name) does disconnect them from their earlier row.
 
-If someone tries to RSVP again for a party where everyone has a final answer,
-or to re-answer for someone with a final answer, the site asks them to contact
-you. The Google account that owns the script gets an email with the answers on
+If a reply includes people who already have a final answer (for example, the
+form was open on two phones), those people are skipped and keep their earlier
+answer, everyone else in the reply is saved, and the site lists who was
+skipped. If everyone in the reply was skipped, or a party where everyone has a
+final answer searches again, the site asks them to contact you. The Google account that owns the script gets an email with the answers on
 file, at most once an hour per party, so repeated tries can't flood your inbox.
 To change a final answer, edit that person's row in the RSVP tab. To let them
 reply again on the site, delete their row.

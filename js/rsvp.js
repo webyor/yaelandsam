@@ -115,6 +115,14 @@
     }
   }
 
+  /** English names from the server, shown the way the form shows them (guest's alphabet). */
+  function shownNames(englishNames) {
+    return englishNames.map((n) => {
+      const i = party.members.indexOf(n);
+      return (i !== -1 && party.display && party.display[i]) || n;
+    });
+  }
+
   async function sendRsvp(event) {
     event.preventDefault();
     if (!hasAnswer()) {
@@ -127,13 +135,18 @@
     try {
       const body = await post(rsvpForm);
       if (body.error === "already_replied") {
-        // Someone in this reply was answered first from elsewhere (e.g. a second phone).
-        setStatus(rsvpForm, "rsvp.alreadyReplied", "err");
+        // Everyone picked had already been answered elsewhere (e.g. a second phone).
+        setStatus(rsvpForm, "rsvp.pickedReplied", "err");
         button.hidden = true;
         return;
       }
       if (!body.ok) throw new Error(body.error || "Server rejected the reply");
       setStatus(rsvpForm, "forms.thanks", "ok");
+      if (body.skipped && body.skipped.length) {
+        // The rest were saved; tell the guest whose earlier answer was kept.
+        rsvpForm.querySelector(".form-status").textContent +=
+          " " + t("rsvp.someSkipped").replace("{names}", shownNames(body.skipped).join(", "));
+      }
       button.hidden = true; // done; guests can still use "Not you?" to start over
     } catch (err) {
       console.error("RSVP failed:", err);

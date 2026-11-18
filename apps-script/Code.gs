@@ -20,15 +20,17 @@
  *  - rsvp:    party, "att:<English full name>" = "yes" | "no" | "maybe" for each person answered
  *  - dietary: name, dietary -> one Dietary row
  *  - version             -> { ok, version } (lets the site owner check which script is deployed)
- * If everyone in the party has a final answer (lookup), or the form tries to answer
- * for someone with a final answer (rsvp), the reply is { ok: false, error: "already_replied" }
- * and the script owner gets an email, at most once an hour per party.
+ * If everyone in the party has a final answer (lookup), the reply is
+ * { ok: false, error: "already_replied" }. If an rsvp includes people with a final
+ * answer, they are skipped and everyone else is saved: { ok: true, skipped: [names] }
+ * (or "already_replied" if all were skipped). Either way the script owner gets an
+ * email, at most once an hour per party.
  *
  * Setup is in README.md ("RSVP setup").
  */
 
 /** Bump when this file changes, so a "version" request shows whether Google runs the latest copy. */
-var SCRIPT_VERSION = "2026-11-17-maybe-changeable";
+var SCRIPT_VERSION = "2026-11-18-partial-save";
 
 var GUESTS_SHEET = "Guests";
 var RSVP_SHEET = { sheet: "RSVP", header: ["timestamp", "party", "guest", "attending", "email", "message", "lang"] };
@@ -205,8 +207,10 @@ function notifyRepeat(party, detail, lang, answered) {
  * Answers are matched by name, so a Guests tab edited between lookup and submit
  * can't put an answer on the wrong person. People left out are skipped. A person
  * whose answer is "maybe" can change it: their row is updated in place, so each
- * person keeps one row. Anyone with a final yes/no can't be answered again: the
- * whole reply is refused and the owner is emailed.
+ * person keeps one row. Anyone who already has a final yes/no is skipped (their
+ * earlier answer stays) while everyone else in the reply is saved; the reply lists
+ * the skipped people as { ok: true, skipped: [names] } and the owner is emailed.
+ * If everyone picked was skipped, nothing is saved: { ok: false, error: "already_replied" }.
  */
 function saveRsvp(p) {
   var party = String(p.party || "").trim();
@@ -228,12 +232,13 @@ function saveRsvp(p) {
   };
 
   // Check and write under one lock, so two replies for the same person at once can't both get in.
-  var clash = withLock(function () {
+  var result = withLock(function () {
     var answered = answersFor(members);
-    if (names.some(function (g) { return isFinal(answered[g]); })) return answered;
+    var skipped = names.filter(function (g) { return isFinal(answered[g]); });
     var sheet = getSheet(RSVP_SHEET);
     var fresh = [];
     names.forEach(function (g) {
+      if (skipped.indexOf(g) !== -1) return; // final answer on file: keep it
       if (answered[g]) {
         sheet.getRange(answered[g].row, 1, 1, RSVP_SHEET.header.length).setValues([rowFor(g)]); // was "maybe"
       } else {
@@ -241,14 +246,16 @@ function saveRsvp(p) {
       }
     });
     if (fresh.length) sheet.getRange(sheet.getLastRow() + 1, 1, fresh.length, fresh[0].length).setValues(fresh);
-    return null;
+    return { answered: answered, skipped: skipped };
   });
-  if (clash) {
-    notifyRepeat(party, "The RSVP form tried to answer again for someone who already replied " +
-      "(for example from a second phone).", p.lang, clash);
-    return { ok: false, error: "already_replied" };
+  if (result.skipped.length) {
+    notifyRepeat(party, "The RSVP form tried to answer again for: " + result.skipped.join(", ") +
+      ". Their earlier answer was kept" +
+      (result.skipped.length < names.length ? "; the others in the reply were saved." : "."),
+      p.lang, result.answered);
   }
-  return { ok: true };
+  if (result.skipped.length === names.length) return { ok: false, error: "already_replied" };
+  return { ok: true, skipped: result.skipped };
 }
 
 function saveDietary(p) {
