@@ -142,10 +142,17 @@
       }
       if (!body.ok) throw new Error(body.error || "Server rejected the reply");
       setStatus(rsvpForm, "forms.thanks", "ok");
-      if (body.skipped && body.skipped.length) {
-        // The rest were saved; tell the guest whose earlier answer was kept.
+      // Tell the guest who in the party already had a final answer and kept it: people who
+      // had replied before this visit (their choices were hidden) plus anyone the server
+      // skipped because they were answered meanwhile (e.g. from a second phone).
+      const earlier = party.members.filter((m) => {
+        const a = (party.answered || {})[m];
+        return a && a !== "maybe";
+      });
+      const kept = [...new Set([...earlier, ...(body.skipped || [])])];
+      if (kept.length) {
         rsvpForm.querySelector(".form-status").textContent +=
-          " " + t("rsvp.someSkipped").replace("{names}", shownNames(body.skipped).join(", "));
+          " " + t("rsvp.someSkipped").replace("{names}", shownNames(kept).join(", "));
       }
       button.hidden = true; // done; guests can still use "Not you?" to start over
     } catch (err) {
