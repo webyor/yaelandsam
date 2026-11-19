@@ -3,12 +3,12 @@
  *  1. Guest types their name (#find-form). The Apps Script looks it up in the
  *     Google Sheet's "Guests" tab and returns their party: { name, members: [...] }.
  *  2. #rsvp-form shows the party name, how many people are in it, and for each
- *     person: Joyfully accepts / Regretfully declines / Maybe, nothing preselected.
- *     Guests answer for whoever they want; anyone left blank isn't sent and can be
- *     answered on a later visit. Everyone gets the choices, whether or not they
- *     already replied; the form doesn't reveal earlier answers. Answers go as
- *     "att:<English full name>" = "yes" | "no" | "maybe", so they match by name, not
- *     position. At least one is needed.
+ *     person: Joyfully accepts / Regretfully declines, nothing preselected. Guests
+ *     answer for whoever they want; anyone left blank isn't sent and can be answered
+ *     on a later visit. Someone who already replied shows "Already RSVPed" with no
+ *     choices, and their answer is never shown. Answers go as
+ *     "att:<English full name>" = "yes" | "no", so they match by name, not position.
+ *     At least one is needed.
  *  3. The server saves everyone picked except people who already have a final yes/no,
  *     and returns those as `skipped`. The message then thanks them for whoever was
  *     saved and names who already RSVPed, e.g. "Thank you! We received the response for
@@ -27,14 +27,16 @@
   const rsvpForm = document.getElementById("rsvp-form");
   const resultBox = document.getElementById("rsvp-result");
   // After a lookup: { name, members: [English names], display: [names in the alphabet the
-  // guest searched with] }. (The server also sends `answered`; the form doesn't show it.)
+  // guest searched with], answered: { English name: "yes"|"no"|"maybe" } }. Only whether
+  // someone answered is used; the answer itself is never shown.
+  // ("maybe" can only come from older replies; it isn't final, so they get choices again.)
   let party = null;
 
   /** Error codes the server can return for a lookup, mapped to message keys. */
   const LOOKUP_ERRORS = { not_found: "rsvp.notFound", multiple: "rsvp.multiple", already_replied: "rsvp.alreadyReplied" };
 
   /** The answers a guest can give, in display order, with their label keys. */
-  const ANSWER_KEYS = { yes: "rsvp.yes", no: "rsvp.no", maybe: "rsvp.maybe" };
+  const ANSWER_KEYS = { yes: "rsvp.yes", no: "rsvp.no" };
 
   function show(form) {
     findForm.hidden = form !== findForm;
@@ -50,9 +52,16 @@
     return span;
   }
 
+  /** True if this person already has a final answer (yes/no) on file. */
+  function alreadyAnswered(name) {
+    const a = (party.answered || {})[name];
+    return a === "yes" || a === "no";
+  }
+
   /**
-   * One fieldset per person: Joyfully accepts / Regretfully declines / Maybe, nothing
-   * preselected, so guests can answer for just the people they want. `name` is the
+   * One fieldset per person: Joyfully accepts / Regretfully declines, nothing preselected,
+   * so guests can answer for just the people they want. Someone who already replied
+   * shows only "Already RSVPed" (no choices, no hint of their answer). `name` is the
    * English name (sent with the answer); the legend shows the name in the guest's alphabet.
    */
   function memberFieldset(name, i) {
@@ -60,6 +69,13 @@
     const legend = document.createElement("legend");
     legend.textContent = (party.display || [])[i] || name;
     fieldset.append(legend);
+    if (alreadyAnswered(name)) {
+      const note = document.createElement("p");
+      note.className = "muted";
+      note.append(label("rsvp.alreadyRsvped"));
+      fieldset.append(note);
+      return fieldset;
+    }
     Object.entries(ANSWER_KEYS).forEach(([value, key]) => {
       const wrap = document.createElement("label");
       const radio = document.createElement("input");

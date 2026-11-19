@@ -51,14 +51,6 @@ Save the photos with these exact names, and they replace the placeholders:
 
 The venue picture on the Travel tab uses `images/save-the-date.jpg`.
 
-## Language screen
-
-On a guest's first visit, the site opens on a welcome screen, written in all
-three languages, where they choose English, Hebrew or Russian. The passcode
-screen and the site then appear in that language. The choice is remembered in
-the browser, so later visits skip this screen. The language buttons at the
-top of the site still switch languages at any time.
-
 ## Passcode
 
 Guests must type the passcode (`Y&S2027`, not case-sensitive) before the
@@ -99,30 +91,26 @@ Make a tab named exactly **Guests**, with these four columns in row 1:
 - If two parties have someone with the same name, that guest is asked to
   contact you.
 
-RSVPs land in an **RSVP** tab with one row per person, marked `yes`, `no` or
-`maybe`. A party doesn't have to answer for everyone at the same time. Each
-person can be marked Joyfully accepts, Regretfully declines or Maybe, with
-nothing preselected. Anyone left blank isn't saved and can be answered on
-another visit.
+RSVPs land in an **RSVP** tab with one row per person, marked `yes` or `no`.
+A party doesn't have to answer for everyone at the same time. Each person can
+be marked Joyfully accepts or Regretfully declines, with nothing preselected.
+Anyone left blank isn't saved and can be answered on another visit.
 
-- **Everyone in the party always gets the three choices.** The form doesn't
-  show earlier answers.
+- **Someone who already replied** shows "Already RSVPed" on the form, with no
+  choices. Their answer is never shown on the site.
+- **If a reply still includes someone who already RSVPed** (for example, the
+  form was open on two phones), that person keeps their earlier answer, and
+  everyone else in the reply is saved. The site says, for example, "Thank
+  you! We received the response for Hillel Weber. Noa Weber already RSVPed.
+  If you need to make a change, please reach out to Yael or Sam."
 - **After sending, the page goes back to the top of the home tab** and shows
-  the result in a box there. Answering again means clicking RSVP and searching
-  again. If sending fails (for example, no connection), the form stays open
-  with the choices so the guest can retry.
-- **Yes and no are final.** If a reply includes someone who already said yes
-  or no, that person keeps their earlier answer, and everyone else in the reply
-  is saved. The site says, for example, "Thank you! We received the response
-  for Hillel Weber. Noa Weber already RSVPed. If you need to make a change,
-  please reach out to Yael or Sam." Several names are listed as "A, B and C".
-  If everyone in the reply had already RSVPed, nothing changes, and only the
-  "already RSVPed" part is shown.
-- **Maybe can be changed.** A new answer updates that person's existing row,
-  so each person keeps one row.
+  the result in a box there. If sending fails (for example, no connection),
+  the form stays open with the choices so the guest can retry.
 - **Answers follow the person, not the party name.** Renaming a party, or
   reordering the Guests tab, doesn't lose or mix up anyone's answer. Renaming a
   *person* (First/Last Name) does disconnect them from their earlier row.
+- Older `maybe` rows (from before Maybe was removed) aren't final, so those
+  people can still answer on the site.
 
 When a party where everyone has a final answer searches again, the site asks
 them to contact you. Repeat attempts email the Google account that owns the

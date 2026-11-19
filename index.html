@@ -31,14 +31,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Great+Vibes&family=Frank+Ruhl+Libre:wght@400;500&family=Marck+Script&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=9735582f">
+  <link rel="stylesheet" href="css/style.css?v=6f05be68">
 </head>
-<!--
-  "choose-lang" shows the language screen first; app.js removes it once a language
-  has been chosen (or was chosen on an earlier visit).
-  "locked" hides the site until the passcode is entered (js/gate.js).
--->
-<body class="choose-lang locked">
+<!-- "locked" hides the site until the passcode is entered (js/gate.js). -->
+<body class="locked">
   <header class="site-header">
     <div class="lang-switch" role="group" aria-label="Language">
       <button type="button" data-lang="en">English</button>
@@ -58,29 +54,6 @@
       <a href="#todo" data-i18n="nav.todo"></a>
     </nav>
   </header>
-
-  <!--
-    Language screen, shown first while the body has class "choose-lang".
-    Written in all three languages, since no language has been picked yet.
-  -->
-  <section id="lang-picker" class="lang-picker" aria-labelledby="lang-picker-title">
-    <img class="sprig" src="images/flower.png" alt="" width="692" height="174">
-    <h2 id="lang-picker-title" class="lang-picker-welcome">
-      <span lang="en">Welcome</span>
-      <span lang="he" dir="rtl">ברוכים הבאים</span>
-      <span lang="ru">Добро пожаловать</span>
-    </h2>
-    <p class="lang-picker-ask">
-      <span lang="en">Please choose a language</span>
-      <span lang="he" dir="rtl">נא לבחור שפה</span>
-      <span lang="ru">Пожалуйста, выберите язык</span>
-    </p>
-    <div class="lang-picker-buttons">
-      <button type="button" class="btn" data-pick-lang="en" lang="en">English</button>
-      <button type="button" class="btn" data-pick-lang="he" lang="he">עברית</button>
-      <button type="button" class="btn" data-pick-lang="ru" lang="ru">Русский</button>
-    </div>
-  </section>
 
   <!-- Passcode screen, shown while the body has class "locked". -->
   <section id="gate" class="gate">
@@ -102,7 +75,7 @@
       <p class="eyebrow" data-i18n="home.eyebrow"></p>
       <p class="eyebrow eyebrow-sub" data-i18n="home.eyebrowSub"></p>
       <!-- Horizontal garland built from the Save the Date's corner art: flowers centred, leafy branches either side. -->
-      <img class="sprig" src="images/flower.png" alt="" width="692" height="174">
+      <img class="sprig" src="images/flower.png" alt="" width="652" height="200">
       <p class="date-line" data-i18n="home.date"></p>
       <p class="venue-line" data-i18n="home.venue"></p>
 
@@ -244,11 +217,11 @@
   </footer>
 
   <script src="js/config.js?v=8f9a2d6b"></script>
-  <script src="js/lang/en.js?v=160fa520"></script>
-  <script src="js/lang/he.js?v=80d46590"></script>
-  <script src="js/lang/ru.js?v=723e1b14"></script>
-  <script src="js/app.js?v=556d0120"></script>
+  <script src="js/lang/en.js?v=8ec76602"></script>
+  <script src="js/lang/he.js?v=85e45419"></script>
+  <script src="js/lang/ru.js?v=50e48743"></script>
+  <script src="js/app.js?v=94acb03d"></script>
   <script src="js/gate.js?v=3899f6ee"></script>
-  <script src="js/rsvp.js?v=a6db0ee4"></script>
+  <script src="js/rsvp.js?v=28f3c522"></script>
 </body>
 </html>

@@ -54,7 +54,7 @@ window.LANG.en = {
     email: "Email (optional)",
     yes: "Joyfully accepts",
     no: "Regretfully declines",
-    maybe: "Maybe",
+    alreadyRsvped: "Already RSVPed",
     message: "A note for the couple (optional)",
     submit: "Send RSVP",
   },
