@@ -49,7 +49,10 @@ Save the photos with these exact names, and they replace the placeholders:
 - `images/couple.jpg`: the photo of Yael and Sam on the Home tab
 - `images/party.jpg`: the photo on the Entertainment & Food tab
 
-The venue picture on the Travel tab uses `images/save-the-date.jpg`.
+The venue picture on the Travel tab (`images/venue.jpg`) and the link-preview
+picture (`images/share.jpg`) are cut from the original invite,
+`images/save-the-date.jpg`. The corner flowers are `images/corner-flowers.webp`,
+and the garland in the middle of the home page is `images/garland.webp`.
 
 ## Passcode
 
