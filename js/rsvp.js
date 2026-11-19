@@ -1,7 +1,8 @@
 /**
  * RSVP flow.
- *  1. Guest types their name (#find-form). The Apps Script looks it up in the
- *     Google Sheet's "Guests" tab and returns their party: { name, members: [...] }.
+ *  1. Guest types their name (#find-form): a full name, or just a first name if no
+ *     other guest shares it. The Apps Script looks it up in the Google Sheet's
+ *     "Guests" tab and returns their party: { name, members: [...] }.
  *  2. #rsvp-form shows the party name, how many people are in it, and for each
  *     person: Joyfully accepts / Regretfully declines, nothing preselected. Guests
  *     answer for whoever they want; anyone left blank isn't sent and can be answered
@@ -33,7 +34,12 @@
   let party = null;
 
   /** Error codes the server can return for a lookup, mapped to message keys. */
-  const LOOKUP_ERRORS = { not_found: "rsvp.notFound", multiple: "rsvp.multiple", already_replied: "rsvp.alreadyReplied" };
+  const LOOKUP_ERRORS = {
+    not_found: "rsvp.notFound",
+    multiple: "rsvp.multiple",
+    need_full_name: "rsvp.needFullName", // first name shared by more than one guest
+    already_replied: "rsvp.alreadyReplied",
+  };
 
   /** The answers a guest can give, in display order, with their label keys. */
   const ANSWER_KEYS = { yes: "rsvp.yes", no: "rsvp.no" };

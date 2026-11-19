@@ -37,11 +37,12 @@ window.LANG.en = {
   rsvp: {
     title: "RSVP",
     name: "Full name",
-    findLabel: "Please enter your first and last name as they appear on your invitation",
+    findLabel: "Please enter your first name, or your first and last name, as they appear on your invitation",
     findButton: "Find my invitation",
     searching: "Looking you up…",
     notFound: "We couldn't find that name. Please check the spelling, or contact Yael or Sam.",
     multiple: "More than one guest has that name. Please contact Yael or Sam to RSVP.",
+    needFullName: "More than one guest has that first name. Please type your first and last name.",
     alreadyReplied: "Everyone in your party has already replied. Thank you! To make a change, please contact Yael or Sam.",
     savedFor: "Thank you! We received the response for {saved}.",
     alreadyOne: "{skipped} already RSVPed. If you need to make a change, please reach out to Yael or Sam.",

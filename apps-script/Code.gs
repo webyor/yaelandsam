@@ -17,6 +17,8 @@
  * Requests the website sends (formType):
  *  - lookup:  name   -> { ok, party: { name, members: [English full names], display: [names in the
  *               alphabet the guest searched with], answered: { name: "yes"|"no"|"maybe" } } }
+ *             `name` can be a full name, or just a first name if no other guest shares it;
+ *             a shared first name answers { ok: false, error: "need_full_name" }.
  *  - rsvp:    party, "att:<English full name>" = "yes" | "no" | "maybe" for each person answered
  *  - dietary: name, dietary -> one Dietary row
  *  - version             -> { ok, version } (lets the site owner check which script is deployed)
@@ -30,7 +32,7 @@
  */
 
 /** Bump when this file changes, so a "version" request shows whether Google runs the latest copy. */
-var SCRIPT_VERSION = "2026-11-18-partial-save";
+var SCRIPT_VERSION = "2026-11-19-first-name";
 
 var GUESTS_SHEET = "Guests";
 var RSVP_SHEET = { sheet: "RSVP", header: ["timestamp", "party", "guest", "attending", "email", "message", "lang"] };
@@ -72,7 +74,11 @@ function normalize(name) {
  * Reads the Guests tab into:
  *  - parties:   { partyName: [English full names] }  (what the RSVP tab records)
  *  - spellings: { partyName: [[other spellings of member 0], [... member 1], ...] }
- *  - index:     normalized name (any spelling) -> list of party names
+ *  - index:     normalized full name (any spelling) -> list of party names
+ *  - firstIndex: normalized first name -> list of people as [party, English full name,
+ *               English first name] (from the First Name column, and the first word of
+ *               each Other Spelling)
+ *  - firstCount: normalized English first name -> how many guests have it
  */
 function readGuests() {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(GUESTS_SHEET);
@@ -81,6 +87,8 @@ function readGuests() {
   var parties = {};
   var spellings = {};
   var index = {}; // normalized name -> list of party names
+  var firstIndex = {}; // normalized first name -> list of people
+  var firstCount = {}; // normalized English first name -> number of guests
   rows.forEach(function (r) {
     var party = String(r[0]).trim();
     var full = (String(r[1]).trim() + " " + String(r[2]).trim()).trim();
@@ -94,8 +102,17 @@ function readGuests() {
       index[key] = index[key] || [];
       if (index[key].indexOf(party) === -1) index[key].push(party);
     });
+    var english = normalize(r[1]);
+    if (english) firstCount[english] = (firstCount[english] || 0) + 1;
+    [english].concat(others.map(function (n) { return normalize(n).split(" ")[0]; }))
+      .forEach(function (first) {
+        if (!first) return;
+        var list = (firstIndex[first] = firstIndex[first] || []);
+        var seen = list.some(function (p) { return p[0] === party && p[1] === full; });
+        if (!seen) list.push([party, full, english]); // same person via several spellings counts once
+      });
   });
-  return { parties: parties, spellings: spellings, index: index };
+  return { parties: parties, spellings: spellings, index: index, firstIndex: firstIndex, firstCount: firstCount };
 }
 
 /** Which alphabet a typed name uses: "hebrew", "cyrillic" or "latin". */
@@ -118,15 +135,27 @@ function displayNames(members, others, alphabet) {
 }
 
 /**
- * Finds the one party a typed full name belongs to, with each member's answer so
- * far. If everyone has a final answer (yes/no), the guest is turned away and the
- * owner is emailed (at most once an hour per party).
+ * Finds the one party a typed name belongs to, with each member's answer so far.
+ * A full name is looked up first; otherwise a first name works if exactly one guest
+ * has it (two or more guests with that first name -> "need_full_name"). If everyone
+ * in the party has a final answer (yes/no), the guest is turned away and the owner
+ * is emailed (at most once an hour per party).
  */
 function lookup(name, lang) {
   var key = normalize(name);
   if (!key) return { ok: false, error: "not_found" };
   var guests = readGuests();
   var matches = guests.index[key] || [];
+  if (matches.length === 0) {
+    var people = guests.firstIndex[key] || [];
+    if (people.length > 1) return { ok: false, error: "need_full_name" };
+    // One match, but also unique in English: "אבי" must not pick Avi Cohen when there's an
+    // Avi Levi with no Hebrew spelling who could be the one typing.
+    if (people.length === 1 && (guests.firstCount[people[0][2]] || 0) > 1) {
+      return { ok: false, error: "need_full_name" };
+    }
+    if (people.length === 1) matches = [people[0][0]];
+  }
   if (matches.length === 0) return { ok: false, error: "not_found" };
   if (matches.length > 1) return { ok: false, error: "multiple" }; // same name in two parties
   var party = matches[0];

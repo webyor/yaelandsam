@@ -80,8 +80,11 @@ Make a tab named exactly **Guests**, with these four columns in row 1:
 - One row per person. Everyone with the same **Party** text is one party.
   The guest sees that text as the title of their RSVP, and the number of
   rows is how many people are in the party.
-- Guests type their first and last name. Capital letters, extra spaces and
-  accents don't matter.
+- Guests type their first and last name, or just their first name if no other
+  guest has the same first name. If two or more guests share a first name, the
+  site asks for the full name. This is checked against the English First Name
+  column too, so a Hebrew or Russian first name only works when the English
+  first name is unique. Capital letters, extra spaces and accents don't matter.
 - **Other Spellings** is optional: other full names to accept, separated by
   `;`. Use it for Hebrew or Russian spellings and nicknames.
 - Names on the RSVP form follow the alphabet the guest searched with. Search
